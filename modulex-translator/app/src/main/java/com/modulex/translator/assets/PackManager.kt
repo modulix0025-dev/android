@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -45,6 +47,9 @@ class PackManager(private val context: Context, private val scope: CoroutineScop
     // noBackupFilesDir: large, re-downloadable data that must never go to cloud backup.
     val store = AssetStore(File(context.noBackupFilesDir, "packs"))
     private val jobs = ConcurrentHashMap<String, Job>()
+    // installBundled() may run concurrently (app start and callers such as tests); both would share
+    // the same staging directory, so the copies are serialised.
+    private val bundledLock = Mutex()
 
     private val _states = MutableStateFlow(manifest.packs.associate { it.id to stateOf(it) })
     val states: StateFlow<Map<String, PackState>> = _states.asStateFlow()
@@ -66,6 +71,10 @@ class PackManager(private val context: Context, private val scope: CoroutineScop
 
     /** Copies packs shipped inside the APK into place (verified against their pinned hashes). */
     suspend fun installBundled() = withContext(Dispatchers.IO) {
+        bundledLock.withLock { installBundledLocked() }
+    }
+
+    private suspend fun installBundledLocked() {
         for (p in manifest.packs.filter { it.bundled }) {
             if (store.status(p) == PackStatus.INSTALLED_VERIFIED) continue
             val streams = p.files.associate { f -> f.name to context.assets.open("tessdata/${f.name}") }

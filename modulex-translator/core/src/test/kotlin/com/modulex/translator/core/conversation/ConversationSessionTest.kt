@@ -111,7 +111,9 @@ class ConversationSessionTest {
             a1.join(); b1.join()
             g.sendUtterance("two", "en", "ar", null)
             g.sendUtterance("three", "en", "ar", null)
-            assertEquals(2, g.pendingOutbound)
+            // "one" may or may not have been acknowledged before the drop. If not, it is replayed
+            // on reconnect and must be dropped as a duplicate by the receiver (asserted below).
+            assertTrue(g.pendingOutbound in 2..3, "pending=${g.pendingOutbound}")
 
             // Reconnect: queued messages arrive once, in order.
             val rejoined = async(start = CoroutineStart.UNDISPATCHED) { h.events.filterIsInstance<SessionEvent.PeerJoined>().first() }

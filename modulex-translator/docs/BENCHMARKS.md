@@ -12,13 +12,14 @@ These measure software overhead and correctness, not phone performance.
 Full stack: TLS 1.3 handshake with certificate pinning, HMAC-authenticated join, then 200 sequential
 utterances with acknowledgements.
 
-| Metric | Result |
-|---|---|
-| Connect + TLS 1.3 + mutual authentication | 29.1 ms |
-| Delivery latency, median | 0.95 ms |
-| Delivery latency, P95 | 3.25 ms |
-| Delivery latency, max | 5.80 ms |
+| Metric | Run 1 | Run 2 |
+|---|---|---|
+| Connect + TLS 1.3 + mutual authentication | 29.1 ms | 36.8 ms |
+| Delivery latency, median | 0.95 ms | 1.06 ms |
+| Delivery latency, P95 | 3.25 ms | 5.03 ms |
+| Delivery latency, max | 5.80 ms | 19.35 ms |
 
+Two runs on a shared 4-vCPU container: the tail varies with host load.
 This is the lower bound added by the protocol and crypto. Wi-Fi/Bluetooth radio latency comes on top
 and must be measured on devices.
 

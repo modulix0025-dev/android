@@ -33,7 +33,7 @@ val localProps = java.util.Properties().apply {
 val sdkConfigured = localProps.getProperty("sdk.dir") != null ||
     System.getenv("ANDROID_HOME") != null ||
     System.getenv("ANDROID_SDK_ROOT") != null
-if (sdkConfigured || providers.gradleProperty("modulex.forceApp").isPresent) {
+if (sdkConfigured) {
     include(":app")
 } else {
     logger.lifecycle("ModuleX: Android SDK not configured; building :core and :signaling only.")

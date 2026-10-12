@@ -71,7 +71,7 @@ class BluetoothTransport(private val context: Context, private val tls: PeerTls)
                 .setConnectable(true)
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
                 .build()
-            adapter.bluetoothLeAdvertiser?.startAdvertising(settings, data, advertiseCallback)
+            adapter!!.bluetoothLeAdvertiser?.startAdvertising(settings, data, advertiseCallback)
                 ?: error("Bluetooth advertising unavailable")
         }
 

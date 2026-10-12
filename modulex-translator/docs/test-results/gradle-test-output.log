@@ -1,12 +1,12 @@
 ModuleX: Android SDK not configured; building :core and :signaling only.
+> Task :signaling:checkKotlinGradlePluginConfigurationErrors SKIPPED
 > Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
 > Task :engines:checkKotlinGradlePluginConfigurationErrors SKIPPED
 > Task :engines:processResources NO-SOURCE
-> Task :signaling:checkKotlinGradlePluginConfigurationErrors SKIPPED
 
 > Task :engines:buildNativeHost
--- llama.cpp version: 0.6.0-dev
 CMAKE_BUILD_TYPE=Release
+-- llama.cpp version: 0.6.0-dev
 -- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
 -- CMAKE_SYSTEM_PROCESSOR: x86_64
 -- GGML_SYSTEM_ARCH: x86
@@ -43,26 +43,26 @@ fatal: No names found, cannot describe anything.
 -- ccache not found, disabling ccache support
 -- Ninja job pools: compile=3, link=1
 -- Found leptonica version: 1.88.0
--- COMPILE_OUTPUT: Change Dir: '/home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-kR3Wh4'
+-- COMPILE_OUTPUT: Change Dir: '/home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-WunJ0q'
+
 CMake Warning at /home/user/android/modulex-translator/third_party/tesseract/cmake/CheckFunctions.cmake:48 (message):
   Failed to compile test
-
-Run Build Command(s): /usr/bin/ninja -v cmTC_649f7
-[1/2] /usr/bin/c++  -I/home/user/android/modulex-translator/native/../third_party/leptonica/src -I/home/user/android/modulex-translator/build/native-host/leptonica-public -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -c /home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-kR3Wh4/tiff_test.cpp
-[2/2] : && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -o cmTC_649f7  -lleptonica && :
-FAILED: cmTC_649f7 
-: && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -o cmTC_649f7  -lleptonica && :
+Run Build Command(s): /usr/bin/ninja -v cmTC_a9666
+[1/2] /usr/bin/c++  -I/home/user/android/modulex-translator/native/../third_party/leptonica/src -I/home/user/android/modulex-translator/build/native-host/leptonica-public -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/cmTC_a9666.dir/tiff_test.cpp.o -c /home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-WunJ0q/tiff_test.cpp
+[2/2] : && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_a9666.dir/tiff_test.cpp.o -o cmTC_a9666  -lleptonica && :
+FAILED: cmTC_a9666 
+: && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_a9666.dir/tiff_test.cpp.o -o cmTC_a9666  -lleptonica && :
 /usr/bin/ld: cannot find -lleptonica: No such file or directory
 collect2: error: ld returned 1 exit status
 ninja: build stopped: subcommand failed.
 
-
--- Leptonica_INCLUDE_DIRS: /home/user/android/modulex-translator/native/../third_party/leptonica/src;/home/user/android/modulex-translator/build/native-host/leptonica-public
 Call Stack (most recent call first):
--- Leptonica_LIBRARIES: leptonica
   /home/user/android/modulex-translator/third_party/tesseract/CMakeLists.txt:457 (check_leptonica_tiff_support)
 
 
+
+-- Leptonica_INCLUDE_DIRS: /home/user/android/modulex-translator/native/../third_party/leptonica/src;/home/user/android/modulex-translator/build/native-host/leptonica-public
+-- Leptonica_LIBRARIES: leptonica
 -- LEPT_TIFF_RESULT: 
 -- LEPT_TIFF_COMPILE: 
 -- Leptonica was build with TIFF support.
@@ -110,7 +110,7 @@ ScrollView debugging disabled.
 -- --------------------------------------------------------
 -- 
 -- Precompiled headers enabled for libtesseract (excluding architecture-specific files)
--- Configuring done (1.0s)
+-- Configuring done (0.8s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/user/android/modulex-translator/build/native-host
 ninja: no work to do.
@@ -157,12 +157,6 @@ AssetsTest > corruptionAfterInstallIsDetected PASSED
 
 AssetsTest > packsInUseCannotBeDeletedOrReplaced PASSED
 
-> Task :engines:compileTestKotlin
-> Task :engines:compileTestJava NO-SOURCE
-> Task :engines:testClasses
-
-> Task :core:test
-
 AssetsTest > corruptedDownloadIsRejectedAndNotMarkedInstalled PASSED
 
 AssetsTest > unpinnedPacksAreNeverDownloaded PASSED
@@ -172,6 +166,12 @@ AssetsTest > ggufHeaderIsParsed PASSED
 ShippedManifestTest > shippedManifestIsValidAndHonest PASSED
 
 ConversationSessionTest > wrongSecretIsRejectedByHost PASSED
+
+> Task :engines:compileTestKotlin
+> Task :engines:compileTestJava NO-SOURCE
+> Task :engines:testClasses
+
+> Task :core:test
 
 ConversationSessionTest > handshakeAuthenticatesAndDeliversBothDirections PASSED
 
@@ -221,46 +221,6 @@ PairingTest > rejectsExpiredForeignAndIncompletePayloads PASSED
 
 PairingTest > qrPayloadRoundTrips PASSED
 
-Error in pixReadMemTiff: function not present
-Error in pixReadMem: tiff: no pix returned
-Error in pixaGenerateFontFromString: pix not made
-Error in bmfCreate: font pixa not made
-
-> Task :engines:test
-
-Error in pixReadMemTiff: function not present
-Error in pixReadMem: tiff: no pix returned
-Error in pixaGenerateFontFromString: pix not made
-Error in bmfCreate: font pixa not made
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Error in pixReadMemTiff: function not present
-Error in pixReadMem: tiff: no pix returned
-Error in pixaGenerateFontFromString: pix not made
-Error in bmfCreate: font pixa not made
-Error in pixReadMemTiff: function not present
-Error in pixReadMem: tiff: no pix returned
-Error in pixaGenerateFontFromString: pix not made
-Error in bmfCreate: font pixa not made
-Error in pixReadMemTiff: function not present
-Error in pixReadMem: tiff: no pix returned
-Error in pixaGenerateFontFromString: pix not made
-Error in bmfCreate: font pixa not made
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-Warning in changeFormatForMissingLib: png library missing; output bmp format
-
-> Task :core:test
-
 PairingTest > pairingCodesNormaliseAndDeriveDeterministically PASSED
 
 PairingTest > idsAreUniqueAndUrlSafe PASSED
@@ -306,6 +266,43 @@ TlsTransportTest > tlsOverRealLoopbackTcp PASSED
 TlsTransportTest > handshakeOverPipesExchangesFramesBothWays PASSED
 
 TlsTransportTest > guestWithoutClientCertificateIsRejected PASSED
+
+> Task :engines:test
+
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
 Warning in changeFormatForMissingLib: png library missing; output bmp format
 Warning in changeFormatForMissingLib: png library missing; output bmp format
 Warning in changeFormatForMissingLib: png library missing; output bmp format
@@ -352,12 +349,16 @@ Warning in changeFormatForMissingLib: png library missing; output bmp format
 [W/llama] llama_decode: failed to decode, ret = 2
 
 
+> Task :signaling:compileTestKotlin
+> Task :signaling:compileTestJava NO-SOURCE
+> Task :signaling:testClasses UP-TO-DATE
+
 > Task :engines:test
 
 OcrEngineTest > blankImageYieldsNoText PASSED
 
 OcrEngineTest > recognisesArabicText STANDARD_OUT
-    OCR ara: raw-cer=0.660 pipeline-cer=0.000 scale=0.50 passes=3 conf=92.1 time=158ms text= مرحبا بكم فيالمطعم |  الرجاء الانتظار حتى يتم تقديمالطعام
+    OCR ara: raw-cer=0.660 pipeline-cer=0.000 scale=0.50 passes=3 conf=92.1 time=162ms text= مرحبا بكم فيالمطعم |  الرجاء الانتظار حتى يتم تقديمالطعام
 
 OcrEngineTest > recognisesArabicText PASSED
 
@@ -367,15 +368,25 @@ OcrEngineTest > recognisesMixedArabicEnglishPage STANDARD_OUT
       candidate layout@1.00 score=34.0: Exit |  |  مخرجالطوارئ | ‎Pharmacy open 24 hours‏
       candidate layout@0.50 score=35.2: Exit |  ‏مخرجالطوارئ‎ | ‎Pharmacy open 24 hours
       candidate bands(4)@1.00 score=32.1: Exit |  مخرجالطوارئ | Pharmacy open 24 hours
-    OCR mixed: cer=0.261 scale=0.50 conf=95.2 time=372ms text=Exit |  مخرجالطوارئ | Pharmacy open 24 hours
+    OCR mixed: cer=0.261 scale=0.50 conf=95.2 time=311ms text=Exit |  مخرجالطوارئ | Pharmacy open 24 hours
       known limitation reproduced: Arabic line 'صيدلية مفتوحة' not recognised
 
 OcrEngineTest > recognisesMixedArabicEnglishPage PASSED
 
 OcrEngineTest > recognisesEnglishText STANDARD_OUT
-    OCR eng: cer=0.000 conf=96.4 time=74ms text=The quick brown fox jumps over the lazy dog. | Platform 4 departs at 10:35 for Cairo.
+    OCR eng: cer=0.000 conf=96.4 time=91ms text=The quick brown fox jumps over the lazy dog. | Platform 4 departs at 10:35 for Cairo.
 
 OcrEngineTest > recognisesEnglishText PASSED
+
+OcrPipelineHelpersTest > diacriticGapsAreMergedIntoOneLine PASSED
+
+OcrPipelineHelpersTest > resizeAveragesAndGrayConversionWeightsChannels PASSED
+
+OcrPipelineHelpersTest > blankPageHasNoBands PASSED
+
+OcrPipelineHelpersTest > bidiMarksAreRemoved PASSED
+
+OcrPipelineHelpersTest > lineBandsFindEachLineWithPadding PASSED
 
 TranslationEngineTest > rejectsNonGgufAndWrongArchitectureBeforeNativeLoad PASSED
 
@@ -384,10 +395,6 @@ TranslationEngineTest > realModelTranslatesCorpus SKIPPED
 TranslationEngineTest > nativeLoaderRejectsTruncatedModelWithoutCrashing PASSED
 
 TranslationEngineTest > pipelineRunsEndToEndWithFixtureModel PASSED
-
-> Task :signaling:compileTestKotlin
-> Task :signaling:compileTestJava NO-SOURCE
-> Task :signaling:testClasses UP-TO-DATE
 
 > Task :signaling:test
 
@@ -437,5 +444,5 @@ UnitTest > parsing PASSED
 
 UnitTest > slidingWindow PASSED
 
-BUILD SUCCESSFUL in 59s
+BUILD SUCCESSFUL in 47s
 16 actionable tasks: 16 executed
