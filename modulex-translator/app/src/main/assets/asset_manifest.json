@@ -1,0 +1,1013 @@
+{
+ "schema": 1,
+ "packs": [
+  {
+   "id": "translation-core",
+   "kind": "translation_model",
+   "title": "Offline Translation Engine",
+   "version": "hy-mt2-1.8b-q4_k_m",
+   "languages": [],
+   "files": [
+    {
+     "name": "model.gguf"
+    }
+   ],
+   "upstream": "tencent/Hy-MT2-1.8B-GGUF (Hugging Face)",
+   "license": "Apache-2.0 (code repository: Tencent-Hunyuan/Hy-MT2; confirm the model card license before redistribution)",
+   "attribution": "Hy-MT2 translation model by Tencent Hunyuan",
+   "meta": {
+    "expected_architecture": "hunyuan-dense",
+    "quantization": "Q4_K_M (candidate; requires no custom kernels)",
+    "pin_with": "tools/pin_assets.py --repo tencent/Hy-MT2-1.8B-GGUF --file <exact Q4_K_M filename>",
+    "excluded_variants": "2bit/1.25bit GGUFs need the STQ kernel (llama.cpp PR #22836, not in mainline)"
+   }
+  },
+  {
+   "id": "speech-base",
+   "kind": "speech_model",
+   "title": "Speech Recognition Engine",
+   "version": "whisper-base-multilingual",
+   "languages": [],
+   "files": [
+    {
+     "name": "ggml-base.bin"
+    }
+   ],
+   "upstream": "ggerganov/whisper.cpp ggml-base.bin (Hugging Face)",
+   "license": "MIT (Whisper weights by OpenAI; whisper.cpp conversion)",
+   "attribution": "Whisper speech recognition model by OpenAI, ggml conversion by the whisper.cpp project",
+   "meta": {
+    "pin_with": "tools/pin_assets.py --repo ggerganov/whisper.cpp --file ggml-base.bin"
+   }
+  },
+  {
+   "id": "speech-small",
+   "kind": "speech_model",
+   "title": "Speech Recognition Engine (higher accuracy)",
+   "version": "whisper-small-multilingual-q5_1",
+   "languages": [],
+   "files": [
+    {
+     "name": "ggml-small-q5_1.bin"
+    }
+   ],
+   "upstream": "ggerganov/whisper.cpp ggml-small-q5_1.bin (Hugging Face)",
+   "license": "MIT (Whisper weights by OpenAI; whisper.cpp conversion)",
+   "attribution": "Whisper speech recognition model by OpenAI, ggml conversion by the whisper.cpp project",
+   "meta": {
+    "pin_with": "tools/pin_assets.py --repo ggerganov/whisper.cpp --file ggml-small-q5_1.bin"
+   }
+  },
+  {
+   "id": "ocr-ara",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ar"
+   ],
+   "files": [
+    {
+     "name": "ara.traineddata",
+     "sizeBytes": 1432056,
+     "sha256": "e3206d3dc87fd50c24a0fb9f01838615911d25168f4e64415244b67d2bb3e729"
+    }
+   ],
+   "upstream": "tessdata_fast ara.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": true,
+   "meta": {
+    "traineddata": "ara"
+   }
+  },
+  {
+   "id": "ocr-ben",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "bn"
+   ],
+   "files": [
+    {
+     "name": "ben.traineddata",
+     "sizeBytes": 855841,
+     "sha256": "31163084c279aaebd376216f0c3d5c17ad4b5fee8db49dae79c20000b5de5964",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ben.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast ben.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "ben"
+   }
+  },
+  {
+   "id": "ocr-bod",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "bo"
+   ],
+   "files": [
+    {
+     "name": "bod.traineddata",
+     "sizeBytes": 1966440,
+     "sha256": "1aab1db8dae337dfc8fa0f94a1c137c47e4c7857c3e6b30093ec726cef912a0b",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/bod.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast bod.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "bod"
+   }
+  },
+  {
+   "id": "ocr-ces",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "cs"
+   ],
+   "files": [
+    {
+     "name": "ces.traineddata",
+     "sizeBytes": 3795684,
+     "sha256": "934bcaf97ef3348413263331131c9fa7f55f30db333c711929c124fb635f7e1b",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ces.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast ces.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "ces"
+   }
+  },
+  {
+   "id": "ocr-chi-sim",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "zh"
+   ],
+   "files": [
+    {
+     "name": "chi_sim.traineddata",
+     "sizeBytes": 2469156,
+     "sha256": "a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/chi_sim.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast chi_sim.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "chi_sim"
+   }
+  },
+  {
+   "id": "ocr-chi-tra",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "yue",
+    "zh-Hant"
+   ],
+   "files": [
+    {
+     "name": "chi_tra.traineddata",
+     "sizeBytes": 2366642,
+     "sha256": "529c5b5797d64b126065cd55f2bb4c7fd7b15790798091b1ff259941a829330b",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/chi_tra.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast chi_tra.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "chi_tra"
+   }
+  },
+  {
+   "id": "ocr-deu",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "de"
+   ],
+   "files": [
+    {
+     "name": "deu.traineddata",
+     "sizeBytes": 1525436,
+     "sha256": "19d219bbb6672c869d20a9636c6816a81eb9a71796cb93ebe0cb1530e2cdb22d",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/deu.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast deu.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "deu"
+   }
+  },
+  {
+   "id": "ocr-eng",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "en"
+   ],
+   "files": [
+    {
+     "name": "eng.traineddata",
+     "sizeBytes": 4113088,
+     "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+    }
+   ],
+   "upstream": "tessdata_fast eng.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": true,
+   "meta": {
+    "traineddata": "eng"
+   }
+  },
+  {
+   "id": "ocr-fas",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "fa"
+   ],
+   "files": [
+    {
+     "name": "fas.traineddata",
+     "sizeBytes": 431500,
+     "sha256": "db1c0a91208aff00d3cf1ed2c1d23f76419afd5f024688b4f71adc3f2ce4a505",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/fas.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast fas.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "fas"
+   }
+  },
+  {
+   "id": "ocr-fil",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "tl"
+   ],
+   "files": [
+    {
+     "name": "fil.traineddata",
+     "sizeBytes": 1841715,
+     "sha256": "2b17f68014ab44b88b5e2334ebcd0ce0090d9af7c6fbef6fab22e0bbd9a934dd",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/fil.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast fil.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "fil"
+   }
+  },
+  {
+   "id": "ocr-fra",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "fr"
+   ],
+   "files": [
+    {
+     "name": "fra.traineddata",
+     "sizeBytes": 1130365,
+     "sha256": "ced037562e8c80c13122dece28dd477d399af80911a28791a66a63ac1e3445ca",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/fra.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast fra.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "fra"
+   }
+  },
+  {
+   "id": "ocr-guj",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "gu"
+   ],
+   "files": [
+    {
+     "name": "guj.traineddata",
+     "sizeBytes": 1418394,
+     "sha256": "fa69658614b4946a9afae8853d67e0689838803dfa3d12c2e35ec53ee6f8df34",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/guj.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast guj.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "guj"
+   }
+  },
+  {
+   "id": "ocr-heb",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "he"
+   ],
+   "files": [
+    {
+     "name": "heb.traineddata",
+     "sizeBytes": 961404,
+     "sha256": "11f9e43ab227f786352a50f75c94c2e9906f1baba86d93276da19da7ce0904db",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/heb.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast heb.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "heb"
+   }
+  },
+  {
+   "id": "ocr-hin",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "hi"
+   ],
+   "files": [
+    {
+     "name": "hin.traineddata",
+     "sizeBytes": 1122751,
+     "sha256": "4c73ffc59d497c186b19d1e90f5d721d678ea6b2e277b719bee4e2af12271825",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/hin.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast hin.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "hin"
+   }
+  },
+  {
+   "id": "ocr-ind",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "id"
+   ],
+   "files": [
+    {
+     "name": "ind.traineddata",
+     "sizeBytes": 1122661,
+     "sha256": "69786901da87ab8766c1ea7fbb10b28f2110c14da3f6c8f2735df131fba95d88",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ind.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast ind.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "ind"
+   }
+  },
+  {
+   "id": "ocr-ita",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "it"
+   ],
+   "files": [
+    {
+     "name": "ita.traineddata",
+     "sizeBytes": 2701314,
+     "sha256": "b8f89e1e785118dac4d51ae042c029a64edb5c3ee42ef73027a6d412748d8827",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ita.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast ita.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "ita"
+   }
+  },
+  {
+   "id": "ocr-jpn",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ja"
+   ],
+   "files": [
+    {
+     "name": "jpn.traineddata",
+     "sizeBytes": 2471260,
+     "sha256": "1f5de9236d2e85f5fdf4b3c500f2d4926f8d9449f28f5394472d9e8d83b91b4d",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/jpn.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast jpn.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "jpn"
+   }
+  },
+  {
+   "id": "ocr-kaz",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "kk"
+   ],
+   "files": [
+    {
+     "name": "kaz.traineddata",
+     "sizeBytes": 4734644,
+     "sha256": "fcc01eed3815a42b9c6321c4c9d3606f39b166cbf95ade98b7d8d12063eae53d",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/kaz.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast kaz.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "kaz"
+   }
+  },
+  {
+   "id": "ocr-khm",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "km"
+   ],
+   "files": [
+    {
+     "name": "khm.traineddata",
+     "sizeBytes": 1446926,
+     "sha256": "47f110575341b322052f3becbefee61a3ecf1ef549352b5d4d33d28afe30d099",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/khm.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast khm.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "khm"
+   }
+  },
+  {
+   "id": "ocr-kor",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ko"
+   ],
+   "files": [
+    {
+     "name": "kor.traineddata",
+     "sizeBytes": 1677415,
+     "sha256": "6b85e11d9bbf07863b97b3523b1b112844c43e713df8b66418a081fd1060b3b2",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/kor.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast kor.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "kor"
+   }
+  },
+  {
+   "id": "ocr-mar",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "mr"
+   ],
+   "files": [
+    {
+     "name": "mar.traineddata",
+     "sizeBytes": 2118233,
+     "sha256": "0ba3f2d116972e72fe9e176bc84c38e81dfb6670f4ed1f7f6c8e16a27da7cb61",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/mar.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast mar.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "mar"
+   }
+  },
+  {
+   "id": "ocr-mon",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "mn"
+   ],
+   "files": [
+    {
+     "name": "mon.traineddata",
+     "sizeBytes": 2137042,
+     "sha256": "a151a3806d61ac43619cd383896d551ba5c3b07388ffec6fc83c8c604d677570",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/mon.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast mon.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "mon"
+   }
+  },
+  {
+   "id": "ocr-msa",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ms"
+   ],
+   "files": [
+    {
+     "name": "msa.traineddata",
+     "sizeBytes": 1747801,
+     "sha256": "e41a3e5febfec50c90371eb1cbb17a48b10cad387900e3420b1f134c1b766cba",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/msa.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast msa.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "msa"
+   }
+  },
+  {
+   "id": "ocr-mya",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "my"
+   ],
+   "files": [
+    {
+     "name": "mya.traineddata",
+     "sizeBytes": 4640561,
+     "sha256": "02aa6c25cfe9e583fa7b5d4131eac948f962308983f0f397df077dea58212b03",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/mya.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast mya.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "mya"
+   }
+  },
+  {
+   "id": "ocr-nld",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "nl"
+   ],
+   "files": [
+    {
+     "name": "nld.traineddata",
+     "sizeBytes": 6050296,
+     "sha256": "ced0e5e046a84c908a6aa7accbef9a232c4a5d9a8276691b81c6ee64d02963f6",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/nld.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast nld.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "nld"
+   }
+  },
+  {
+   "id": "ocr-pol",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "pl"
+   ],
+   "files": [
+    {
+     "name": "pol.traineddata",
+     "sizeBytes": 4765518,
+     "sha256": "c4476cdbc0e33d898d32345122b7be1cbf85ace15f920f06c7714756e1ef79b2",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/pol.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast pol.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "pol"
+   }
+  },
+  {
+   "id": "ocr-por",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "pt"
+   ],
+   "files": [
+    {
+     "name": "por.traineddata",
+     "sizeBytes": 1982756,
+     "sha256": "c4932b937207a9514b7514d518b931a99938c02a28a5a5a553f8599ed58b7deb",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/por.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast por.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "por"
+   }
+  },
+  {
+   "id": "ocr-rus",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ru"
+   ],
+   "files": [
+    {
+     "name": "rus.traineddata",
+     "sizeBytes": 3861738,
+     "sha256": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/rus.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast rus.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "rus"
+   }
+  },
+  {
+   "id": "ocr-spa",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "es"
+   ],
+   "files": [
+    {
+     "name": "spa.traineddata",
+     "sizeBytes": 2294433,
+     "sha256": "6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/spa.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast spa.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "spa"
+   }
+  },
+  {
+   "id": "ocr-tam",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ta"
+   ],
+   "files": [
+    {
+     "name": "tam.traineddata",
+     "sizeBytes": 3237963,
+     "sha256": "d02fbec24be4b07e32e80d0ccfc3b6b67a3c5d61c9d0a7c8532677990912c6ec",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/tam.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast tam.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "tam"
+   }
+  },
+  {
+   "id": "ocr-tel",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "te"
+   ],
+   "files": [
+    {
+     "name": "tel.traineddata",
+     "sizeBytes": 2769654,
+     "sha256": "d10691fddd5b67802e1c12800ebb321d3b8bcd8d24a2ac3ff206f93188c04ab5",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/tel.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast tel.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "tel"
+   }
+  },
+  {
+   "id": "ocr-tha",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "th"
+   ],
+   "files": [
+    {
+     "name": "tha.traineddata",
+     "sizeBytes": 1072600,
+     "sha256": "294227cc2d1292b0acb28d61d4115c88252b96d466ca90b417cf4cf0c67bf07c",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/tha.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast tha.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "tha"
+   }
+  },
+  {
+   "id": "ocr-tur",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "tr"
+   ],
+   "files": [
+    {
+     "name": "tur.traineddata",
+     "sizeBytes": 4550554,
+     "sha256": "7393381111e1152420fc4092cb44eef4237580d21b92bf30d7d221aad192c6b7",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/tur.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast tur.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "tur"
+   }
+  },
+  {
+   "id": "ocr-uig",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ug"
+   ],
+   "files": [
+    {
+     "name": "uig.traineddata",
+     "sizeBytes": 2794272,
+     "sha256": "163b360268c39fc69e0c0dc9299c06dfe7a6c51ef8f33766da75022217b69b22",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/uig.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast uig.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "uig"
+   }
+  },
+  {
+   "id": "ocr-ukr",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "uk"
+   ],
+   "files": [
+    {
+     "name": "ukr.traineddata",
+     "sizeBytes": 3825102,
+     "sha256": "d59e53e2bded32f4445f124b4b00240fcac7e8044c003ab822ccb94f0b3db59b",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ukr.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast ukr.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "ukr"
+   }
+  },
+  {
+   "id": "ocr-urd",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "ur"
+   ],
+   "files": [
+    {
+     "name": "urd.traineddata",
+     "sizeBytes": 1398718,
+     "sha256": "62e8250ce2a994106e313a82e26a516a39e2cf159d0ce3c5b5008387fd0d555f",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/urd.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast urd.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "urd"
+   }
+  },
+  {
+   "id": "ocr-vie",
+   "kind": "ocr_language",
+   "title": "Local Text Recognition",
+   "version": "tessdata_fast@874164186573",
+   "languages": [
+    "vi"
+   ],
+   "files": [
+    {
+     "name": "vie.traineddata",
+     "sizeBytes": 531275,
+     "sha256": "79df64caf7bcfb2a27df5042ecb6121e196eada34da774956995747636d5bfa1",
+     "url": "https://raw.githubusercontent.com/modulix0025-dev/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/vie.traineddata"
+    }
+   ],
+   "upstream": "tessdata_fast vie.traineddata @ 87416418657359cb625c412a48b6e1d6d41c29bd",
+   "license": "Apache-2.0",
+   "attribution": "Tesseract OCR trained data (tessdata_fast), Apache License 2.0",
+   "bundled": false,
+   "meta": {
+    "traineddata": "vie"
+   }
+  },
+  {
+   "id": "voice-en-us-lessac-medium",
+   "kind": "tts_voice",
+   "title": "Offline Voice Engine",
+   "version": "en_US-lessac-medium",
+   "languages": [
+    "en"
+   ],
+   "files": [
+    {
+     "name": "voice.onnx"
+    },
+    {
+     "name": "voice.onnx.json"
+    }
+   ],
+   "upstream": "rhasspy/piper-voices en/en_US/lessac/medium/en_US-lessac-medium.onnx (Hugging Face)",
+   "license": "See the voice MODEL_CARD; verify before redistribution",
+   "attribution": "Piper voice en_US-lessac-medium",
+   "meta": {
+    "pin_with": "tools/pin_assets.py --repo rhasspy/piper-voices --file en/en_US/lessac/medium/en_US-lessac-medium.onnx --file en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"
+   }
+  },
+  {
+   "id": "voice-ar-jo-kareem-medium",
+   "kind": "tts_voice",
+   "title": "Offline Voice Engine",
+   "version": "ar_JO-kareem-medium",
+   "languages": [
+    "ar"
+   ],
+   "files": [
+    {
+     "name": "voice.onnx"
+    },
+    {
+     "name": "voice.onnx.json"
+    }
+   ],
+   "upstream": "rhasspy/piper-voices ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx (Hugging Face)",
+   "license": "See the voice MODEL_CARD; verify before redistribution",
+   "attribution": "Piper voice ar_JO-kareem-medium",
+   "meta": {
+    "pin_with": "tools/pin_assets.py --repo rhasspy/piper-voices --file ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx --file ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx.json"
+   }
+  },
+  {
+   "id": "voice-runtime-data",
+   "kind": "tts_runtime_data",
+   "title": "Offline Voice Engine data",
+   "version": "espeak-ng-data@212928b3",
+   "languages": [],
+   "files": [
+    {
+     "name": "espeak-ng-data.zip"
+    }
+   ],
+   "upstream": "espeak-ng phoneme data built by tools/build-espeak-data.sh",
+   "license": "GPL-3.0-or-later",
+   "attribution": "eSpeak NG",
+   "meta": {
+    "pin_with": "host the zip produced by tools/build-espeak-data.sh and pin it with tools/pin_assets.py --url"
+   }
+  }
+ ]
+}

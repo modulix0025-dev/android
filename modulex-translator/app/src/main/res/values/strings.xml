@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ModuleX Translator</string>
+    <string name="tagline">Speak naturally. Understand each other.</string>
+
+    <!-- Home -->
+    <string name="home_conversation">Live Conversation</string>
+    <string name="home_conversation_desc">Two phones, two languages, one conversation</string>
+    <string name="home_voice">Voice Translator</string>
+    <string name="home_voice_desc">Speak and hear the translation</string>
+    <string name="home_text">Text Translator</string>
+    <string name="home_text_desc">Type or paste text</string>
+    <string name="home_camera">Camera Translator</string>
+    <string name="home_camera_desc">Translate signs, menus and documents</string>
+    <string name="home_packs">Language Packs</string>
+    <string name="home_packs_desc">Install languages for offline use</string>
+    <string name="home_history">Translation History</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_privacy">Privacy &amp; Third-Party Notices</string>
+    <string name="home_engine_missing_title">Set up offline translation</string>
+    <string name="home_engine_missing_body">Install the Offline Translation Engine to start translating without an internet connection.</string>
+    <string name="home_offline_ready">Offline translation ready</string>
+
+    <!-- Common -->
+    <string name="action_back">Back</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_share">Share</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_paste">Paste</string>
+    <string name="action_swap">Swap languages</string>
+    <string name="action_speak">Play translation</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_install">Install</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="action_grant">Allow</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_done">Done</string>
+    <string name="action_manage_packs">Manage language packs</string>
+    <string name="copied">Copied</string>
+    <string name="source_language">From</string>
+    <string name="target_language">To</string>
+    <string name="detect_language">Detect language</string>
+    <string name="choose_language">Choose language</string>
+    <string name="search_languages">Search languages</string>
+    <string name="offline_badge">Offline</string>
+    <string name="original_text">Original</string>
+    <string name="translation">Translation</string>
+    <string name="translating">Translating…</string>
+    <string name="loading_engine">Preparing the translation engine…</string>
+    <string name="chars_count">%1$d / %2$d</string>
+
+    <!-- Language capability labels -->
+    <string name="cap_translation">Translation</string>
+    <string name="cap_speech_in">Speech input</string>
+    <string name="cap_ocr">Text recognition</string>
+    <string name="cap_speech_out">Spoken output</string>
+    <string name="cap_ready">Ready</string>
+    <string name="cap_needs_pack">Needs a language pack</string>
+    <string name="cap_unverified">Not yet available</string>
+    <string name="cap_unsupported">Not supported</string>
+
+    <!-- Text translator -->
+    <string name="text_hint">Enter text to translate</string>
+    <string name="text_too_long">Text is limited to %1$d characters.</string>
+    <string name="text_empty_state">Your translation will appear here.</string>
+    <string name="text_detected">Detected: %1$s</string>
+    <string name="text_direction_ambiguous">Couldn\'t tell the language for sure. Using your selection.</string>
+
+    <!-- Voice -->
+    <string name="voice_tap_to_speak">Tap to speak</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_processing">Recognizing speech…</string>
+    <string name="voice_no_speech">No speech detected. Try again closer to the microphone.</string>
+    <string name="voice_recording_indicator">Microphone is on</string>
+    <string name="voice_latency">Translated in %1$s</string>
+    <string name="voice_unavailable_title">Speech input is not set up</string>
+    <string name="voice_unavailable_body">Install the Speech Recognition Engine to translate what you say.</string>
+
+    <!-- Camera -->
+    <string name="camera_capture">Capture</string>
+    <string name="camera_gallery">Choose from gallery</string>
+    <string name="camera_flash">Flash</string>
+    <string name="camera_recapture">Take another photo</string>
+    <string name="camera_processing">Reading text…</string>
+    <string name="camera_no_text">No text was found. Hold the camera steady and make sure the text is in focus.</string>
+    <string name="camera_recognized">Recognized text</string>
+    <string name="camera_low_confidence">Some text was hard to read. Please check the recognized text.</string>
+    <string name="camera_ocr_languages">Reading: %1$s</string>
+    <string name="camera_ocr_unsupported">Text recognition isn\'t available for %1$s yet.</string>
+
+    <!-- Conversation -->
+    <string name="conv_title">Live Conversation</string>
+    <string name="conv_create">Start a conversation</string>
+    <string name="conv_join">Join a conversation</string>
+    <string name="conv_your_name">Your name</string>
+    <string name="conv_i_speak">I speak</string>
+    <string name="conv_i_read">Show me</string>
+    <string name="conv_connection">Connection</string>
+    <string name="conv_mode_lan">Same Wi-Fi or hotspot</string>
+    <string name="conv_mode_lan_desc">Works without internet when both phones share a network or one phone\'s hotspot.</string>
+    <string name="conv_mode_p2p">Wi-Fi Direct</string>
+    <string name="conv_mode_p2p_desc">Phones connect to each other directly. No router or internet needed.</string>
+    <string name="conv_mode_bt">Bluetooth</string>
+    <string name="conv_mode_bt_desc">Short range, no internet needed.</string>
+    <string name="conv_mode_net">Internet</string>
+    <string name="conv_mode_net_desc">For phones far apart. Needs a configured connection server.</string>
+    <string name="conv_scan_qr">Scan the other phone\'s code</string>
+    <string name="conv_enter_code">Enter a pairing code</string>
+    <string name="conv_show_code">Ask the other person to scan this code</string>
+    <string name="conv_pairing_code">Pairing code: %1$s</string>
+    <string name="conv_waiting">Waiting for the other phone…</string>
+    <string name="conv_connecting">Connecting…</string>
+    <string name="conv_connected_to">Connected to %1$s</string>
+    <string name="conv_verify_title">Confirm the connection</string>
+    <string name="conv_verify_body">Check that the other phone shows the same number: %1$s</string>
+    <string name="conv_verify_match">Numbers match</string>
+    <string name="conv_verify_mismatch">They don\'t match</string>
+    <string name="conv_mismatch_ended">The connection was ended because the numbers didn\'t match.</string>
+    <string name="conv_reconnecting">Connection lost. Reconnecting…</string>
+    <string name="conv_reconnect">Reconnect</string>
+    <string name="conv_end">End conversation</string>
+    <string name="conv_ended_by_peer">The other person ended the conversation.</string>
+    <string name="conv_push_to_talk">Hold to talk</string>
+    <string name="conv_auto_mode">Hands-free</string>
+    <string name="conv_text_mode">Type</string>
+    <string name="conv_mute">Mute microphone</string>
+    <string name="conv_unmute">Unmute microphone</string>
+    <string name="conv_speak_aloud">Read translations aloud</string>
+    <string name="conv_show_original">Show original text</string>
+    <string name="conv_share_original">Share my original words</string>
+    <string name="conv_type_message">Type a message</string>
+    <string name="conv_send">Send</string>
+    <string name="conv_latency">%1$d ms</string>
+    <string name="conv_delivered">Delivered</string>
+    <string name="conv_pending">Sending…</string>
+    <string name="conv_failed">Not delivered</string>
+    <string name="conv_you">You</string>
+    <string name="conv_invalid_code">This code isn\'t valid or has expired.</string>
+    <string name="conv_auth_failed">Couldn\'t verify the other phone. Make sure you scanned the right code.</string>
+    <string name="conv_no_network">Connect both phones to the same Wi-Fi network or hotspot.</string>
+    <string name="conv_bt_off">Bluetooth is turned off.</string>
+    <string name="conv_net_not_configured">Internet mode needs a connection server. Add one in Settings.</string>
+    <string name="conv_signaling_failed">Couldn\'t reach the connection server.</string>
+    <string name="conv_p2p_unavailable">Wi-Fi Direct isn\'t available on this phone.</string>
+    <string name="conv_offline_mode_note">Offline mode: nothing is sent to the internet.</string>
+    <string name="conv_internet_mode_note">Internet mode: messages travel encrypted between the phones; the connection server only helps them find each other.</string>
+    <string name="conv_mode_active">Active mode: %1$s</string>
+
+    <!-- Packs -->
+    <string name="packs_title">Language Packs</string>
+    <string name="packs_engines">Engines</string>
+    <string name="packs_languages">Languages</string>
+    <string name="packs_installed">Installed</string>
+    <string name="packs_verified">Verified</string>
+    <string name="packs_user_import">Imported by you</string>
+    <string name="packs_not_installed">Not installed</string>
+    <string name="packs_partial">Download paused</string>
+    <string name="packs_corrupt">Damaged. Reinstall needed.</string>
+    <string name="packs_update">Update available</string>
+    <string name="packs_unverified">Not yet available for download</string>
+    <string name="packs_size">%1$s</string>
+    <string name="packs_downloading">Downloading %1$s of %2$s</string>
+    <string name="packs_verifying">Verifying…</string>
+    <string name="packs_confirm_title">Download %1$s?</string>
+    <string name="packs_confirm_body">This download needs %1$s. Use Wi-Fi to avoid mobile data charges. Files are checked against a trusted fingerprint before use.</string>
+    <string name="packs_low_storage">Not enough free storage. %1$s needed.</string>
+    <string name="packs_import">Import from file</string>
+    <string name="packs_import_unpinned_title">Use an unverified file?</string>
+    <string name="packs_import_unpinned_body">This pack has no published fingerprint yet, so ModuleX can\'t confirm the file is genuine. Only continue with files from a source you trust.</string>
+    <string name="packs_in_use">This pack is in use and can\'t be removed right now.</string>
+    <string name="packs_failed_network">Download interrupted. It will resume where it stopped.</string>
+    <string name="packs_failed_hash">The downloaded file didn\'t match its fingerprint and was discarded.</string>
+    <string name="packs_offline_available">Available offline</string>
+    <string name="packs_license">License: %1$s</string>
+    <string name="packs_verify_now">Verify files</string>
+    <string name="packs_verify_ok">All files verified.</string>
+    <string name="packs_verify_failed">Verification failed. Please reinstall this pack.</string>
+
+    <string name="pack_kind_translation">Offline Translation Engine</string>
+    <string name="pack_kind_speech">Speech Recognition Engine</string>
+    <string name="pack_kind_speech_hq">Speech Recognition Engine (higher accuracy)</string>
+    <string name="pack_kind_ocr">Text recognition</string>
+    <string name="pack_kind_voice">Offline voice</string>
+    <string name="pack_kind_voice_data">Offline voice data</string>
+    <string name="pack_all_languages">All supported languages</string>
+
+    <!-- History -->
+    <string name="history_title">Translation History</string>
+    <string name="history_empty">Your translations will be saved here on this phone.</string>
+    <string name="history_clear_all">Clear history</string>
+    <string name="history_clear_confirm">Delete all saved translations from this phone?</string>
+    <string name="history_disabled">History is turned off in Settings.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language">App language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_history">Save translation history</string>
+    <string name="settings_history_desc">Kept only on this phone. You can delete it at any time.</string>
+    <string name="settings_conv_history">Save conversation transcripts</string>
+    <string name="settings_speech">Spoken output</string>
+    <string name="settings_speech_rate">Speaking rate</string>
+    <string name="settings_system_voices">Use offline system voices</string>
+    <string name="settings_system_voices_desc">Only voices installed on this phone that work without internet are used.</string>
+    <string name="settings_internet">Internet conversations</string>
+    <string name="settings_signaling_url">Connection server (wss://)</string>
+    <string name="settings_ice_servers">STUN/TURN servers (one per line)</string>
+    <string name="settings_ice_desc">Optional. Format: turn:host:port|username|password. Stored encrypted on this phone.</string>
+    <string name="settings_performance">Performance</string>
+    <string name="settings_keep_loaded">Keep translation engine in memory</string>
+    <string name="settings_keep_loaded_desc">Faster translations, more memory use.</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_diagnostics">Diagnostics</string>
+    <string name="settings_saved">Saved</string>
+    <string name="settings_invalid_url">The server address must start with wss://</string>
+
+    <!-- Privacy -->
+    <string name="privacy_title">Privacy &amp; Notices</string>
+    <string name="privacy_summary">ModuleX Translator translates on your phone. Your voice, photos and text are processed locally and are not uploaded. Audio is kept in memory only while it is being recognized. Conversations in Offline mode never use the internet. In Internet mode, an encrypted connection carries translated text directly between the two phones; the connection server you configure only helps them find each other and can see network addresses and connection times, not your messages.</string>
+    <string name="privacy_permissions">Permissions</string>
+    <string name="privacy_permissions_body">Microphone: only while you speak to translate. Camera: only while the camera translator is open. Nearby devices and Bluetooth: only to connect to the other phone in a conversation. Notifications: to show that a conversation is active.</string>
+    <string name="privacy_storage">Stored on this phone</string>
+    <string name="privacy_storage_body">Language packs, your settings, a device key for secure pairing (in the Android Keystore), and translation history if you keep it on. Nothing is backed up to the cloud.</string>
+    <string name="privacy_no_analytics">No analytics, no advertising, no tracking.</string>
+    <string name="notices_title">Third-Party Notices</string>
+    <string name="notices_intro">ModuleX Translator is built with the following open-source software and models. Their licenses are reproduced below.</string>
+
+    <!-- Errors / states -->
+    <string name="err_model_missing">The Offline Translation Engine isn\'t installed.</string>
+    <string name="err_model_load">The translation engine couldn\'t start. Try again or reinstall the language pack.</string>
+    <string name="err_unsupported_language">This language isn\'t supported for this feature yet.</string>
+    <string name="err_input_too_long">This text is too long to translate at once. Try a shorter part.</string>
+    <string name="err_inference">Translation failed. Please try again.</string>
+    <string name="err_out_of_memory">Not enough free memory. Close other apps and try again.</string>
+    <string name="err_empty_output">No translation was produced. Please rephrase and try again.</string>
+    <string name="err_mic_denied">Microphone access is needed to translate speech.</string>
+    <string name="err_camera_denied">Camera access is needed to translate text in photos.</string>
+    <string name="err_nearby_denied">Nearby devices access is needed to connect to the other phone.</string>
+    <string name="err_storage_low">Not enough storage space.</string>
+    <string name="err_device_hot">Your phone is warm. Some features are slowed down to let it cool.</string>
+    <string name="err_device_too_hot">Your phone is too hot. Translation is paused until it cools down.</string>
+    <string name="err_cpu_unsupported">This phone\'s processor can\'t run the offline engines.</string>
+    <string name="err_speech_unavailable">Spoken output isn\'t available for %1$s on this phone. The translation is shown as text.</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_conversation">Active conversations</string>
+    <string name="notif_conversation_title">Conversation in progress</string>
+    <string name="notif_conversation_mic">Microphone is on for translation</string>
+    <string name="notif_conversation_connected">Connected to %1$s</string>
+    <string name="notif_end">End</string>
+
+    <!-- Diagnostics (debug builds) -->
+    <string name="diag_title">Diagnostics</string>
+</resources>

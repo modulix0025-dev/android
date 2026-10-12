@@ -1,0 +1,18 @@
+{
+ "components": [
+  {"name": "Hy-MT2 translation model (Tencent Hunyuan)", "license": "Apache-2.0", "file": "hy-mt2.txt", "scope": "translation model (downloaded language pack); confirm the model card license before redistribution"},
+  {"name": "llama.cpp / ggml", "license": "MIT", "file": "llama.cpp.txt", "scope": "translation runtime"},
+  {"name": "nlohmann/json (via llama.cpp)", "license": "MIT", "file": "nlohmann-json.txt", "scope": "chat template handling"},
+  {"name": "whisper.cpp", "license": "MIT", "file": "whisper.cpp.txt", "scope": "speech recognition runtime"},
+  {"name": "Whisper speech models (OpenAI)", "license": "MIT", "file": "whisper.cpp.txt", "scope": "speech model (downloaded language pack)"},
+  {"name": "Tesseract OCR", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "text recognition runtime"},
+  {"name": "Leptonica", "license": "BSD-2-Clause", "file": "leptonica.txt", "scope": "image processing for text recognition"},
+  {"name": "tessdata_fast trained data", "license": "Apache-2.0", "file": "tessdata_fast.txt", "scope": "text recognition data (Arabic and English bundled)"},
+  {"name": "WebRTC (webrtc-sdk/android prebuilt)", "license": "BSD-3-Clause and bundled third-party licenses", "file": "webrtc.txt", "scope": "Internet conversation mode"},
+  {"name": "ZXing", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "QR codes (Apache-2.0 text)"},
+  {"name": "OkHttp / Okio", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "signaling connection (Apache-2.0 text)"},
+  {"name": "Kotlin, kotlinx.coroutines, kotlinx.serialization, AndroidX, Jetpack Compose, CameraX", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "application framework (Apache-2.0 text)"},
+  {"name": "Piper (piper1-gpl)", "license": "GPL-3.0", "file": "piper.txt", "scope": "offline voices; only in builds made with -Pmodulex.withPiper=true"},
+  {"name": "eSpeak NG", "license": "GPL-3.0-or-later", "file": "espeak-ng.txt", "scope": "offline voices; only in builds made with -Pmodulex.withPiper=true"}
+ ]
+}
