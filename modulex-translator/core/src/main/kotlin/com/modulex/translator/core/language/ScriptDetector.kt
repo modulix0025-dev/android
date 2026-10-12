@@ -77,4 +77,19 @@ object ScriptDetector {
             else -> PairDecision.Ambiguous
         }
     }
+
+    /**
+     * Detects a source language only when the dominant writing system is used by exactly one
+     * supported language (e.g. Hangul -> Korean, Thai -> Thai). Returns null for shared scripts
+     * (Latin, Arabic, Cyrillic, Han, Devanagari) where script alone cannot decide.
+     */
+    fun detectUnique(text: String, minShare: Double = 0.6): Language? {
+        val h = histogram(text)
+        if (h.total < 2) return null
+        val dom = h.dominant ?: return null
+        // Kana anywhere means Japanese, even when Han characters dominate.
+        if (h.share(Script.KANA) > 0.05) return LanguageRegistry.get("ja")
+        if (h.share(dom) < minShare) return null
+        return LanguageRegistry.all.filter { it.script == dom }.singleOrNull()
+    }
 }

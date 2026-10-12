@@ -1,0 +1,441 @@
+ModuleX: Android SDK not configured; building :core and :signaling only.
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :engines:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :engines:processResources NO-SOURCE
+> Task :signaling:checkKotlinGradlePluginConfigurationErrors SKIPPED
+
+> Task :engines:buildNativeHost
+-- llama.cpp version: 0.6.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.26.0
+-- ggml commit:  f2cc728
+CMAKE_BUILD_TYPE = Release
+-- 
+-- General configuration for Leptonica 1.88.0
+-- --------------------------------------------------------
+-- Build type: Release
+-- Compiler: GNU
+-- C compiler options:  
+-- Linker options:  
+-- Install directory: /usr/local
+-- 
+-- Build with sw [SW_BUILD]: OFF
+-- Build utility programs [BUILD_PROG]: OFF
+-- Used ZLIB library: 
+-- Used PNG library:  
+-- Used JPEG library: 
+-- Used OpenJPEG library: 
+-- Used TIFF library: 
+-- Used GIF library:  
+-- Used WebP library: 
+-- --------------------------------------------------------
+-- 
+fatal: No names found, cannot describe anything.
+-- Configuring tesseract version 5.5.3...
+-- IPO / LTO supported
+-- CMAKE_SYSTEM_PROCESSOR=<x86_64>
+-- ccache not found, disabling ccache support
+-- Ninja job pools: compile=3, link=1
+-- Found leptonica version: 1.88.0
+-- COMPILE_OUTPUT: Change Dir: '/home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-kR3Wh4'
+CMake Warning at /home/user/android/modulex-translator/third_party/tesseract/cmake/CheckFunctions.cmake:48 (message):
+  Failed to compile test
+
+Run Build Command(s): /usr/bin/ninja -v cmTC_649f7
+[1/2] /usr/bin/c++  -I/home/user/android/modulex-translator/native/../third_party/leptonica/src -I/home/user/android/modulex-translator/build/native-host/leptonica-public -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -c /home/user/android/modulex-translator/build/native-host/CMakeFiles/CMakeScratch/TryCompile-kR3Wh4/tiff_test.cpp
+[2/2] : && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -o cmTC_649f7  -lleptonica && :
+FAILED: cmTC_649f7 
+: && /usr/bin/c++ -O3 -DNDEBUG  CMakeFiles/cmTC_649f7.dir/tiff_test.cpp.o -o cmTC_649f7  -lleptonica && :
+/usr/bin/ld: cannot find -lleptonica: No such file or directory
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+
+
+-- Leptonica_INCLUDE_DIRS: /home/user/android/modulex-translator/native/../third_party/leptonica/src;/home/user/android/modulex-translator/build/native-host/leptonica-public
+Call Stack (most recent call first):
+-- Leptonica_LIBRARIES: leptonica
+  /home/user/android/modulex-translator/third_party/tesseract/CMakeLists.txt:457 (check_leptonica_tiff_support)
+
+
+-- LEPT_TIFF_RESULT: 
+-- LEPT_TIFF_COMPILE: 
+-- Leptonica was build with TIFF support.
+-- TIFF support disabled.
+-- LibArchive support disabled.
+-- CURL support disabled.
+ScrollView debugging disabled.
+-- 
+-- General configuration for Tesseract 5.5.3
+-- --------------------------------------------------------
+-- Build type: Release 64 bits
+-- Compiler: GNU
+-- Compiler version: 13.3.0
+-- Used standard: C++20
+-- CXX compiler options:  -O3 -DNDEBUG
+-- Compile definitions = HAVE_AVX;HAVE_AVX2;HAVE_AVX512F;HAVE_FMA;HAVE_SSE4_1;OPENMP_SIMD;CMAKE_BUILD;HAVE_CONFIG_H
+-- Linker options:  
+-- Install directory: /usr/local
+-- HAVE_AVX: 1
+-- HAVE_AVX2: 1
+-- HAVE_AVX512F: 1
+-- HAVE_FMA: 1
+-- HAVE_SSE4_1: 1
+-- MARCH_NATIVE_OPT: OFF
+-- HAVE_NEON: FALSE
+-- Link-time optimization: FALSE
+-- --------------------------------------------------------
+-- Build with openmp support [OPENMP_BUILD]: OFF
+-- Build with libarchive support [HAVE_LIBARCHIVE]: OFF
+-- Build with libcurl support [HAVE_LIBCURL]: OFF
+-- Enable float for LSTM [FAST_FLOAT]: ON
+-- Enable optimization for host CPU (could break HW compatibility) [ENABLE_NATIVE]: OFF
+-- Disable disable graphics (ScrollView) [GRAPHICS_DISABLED]: ON
+-- Disable the legacy OCR engine [DISABLED_LEGACY_ENGINE]: OFF
+-- Build training tools [BUILD_TRAINING_TOOLS]: OFF
+-- Build tests [BUILD_TESTS]: OFF
+-- Use system ICU Library [USE_SYSTEM_ICU]: OFF
+-- Install tesseract configs [INSTALL_CONFIGS]: OFF
+-- --------------------------------------------------------
+-- Modern build optimizations:
+-- Unity build [ENABLE_UNITY_BUILD]: OFF
+-- Precompiled headers [ENABLE_PRECOMPILED_HEADERS]: ON
+-- ccache [ENABLE_CCACHE]: OFF
+-- Ninja job pools [ENABLE_NINJA_POOL]: ON
+-- --------------------------------------------------------
+-- 
+-- Precompiled headers enabled for libtesseract (excluding architecture-specific files)
+-- Configuring done (1.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/user/android/modulex-translator/build/native-host
+ninja: no work to do.
+
+> Task :engines:pipelineFixture
+build/fixtures/pipeline-fixture.gguf
+
+> Task :engines:processTestResources
+> Task :core:processResources NO-SOURCE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:compileKotlin
+> Task :core:compileJava NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar
+> Task :signaling:processResources
+> Task :signaling:processTestResources NO-SOURCE
+> Task :signaling:compileKotlin
+> Task :signaling:compileJava NO-SOURCE
+> Task :signaling:classes
+> Task :signaling:jar
+> Task :core:compileTestKotlin
+> Task :core:compileTestJava NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :engines:compileKotlin
+> Task :engines:compileJava NO-SOURCE
+> Task :engines:classes UP-TO-DATE
+> Task :engines:jar
+
+> Task :core:test
+
+AssetsTest > productionSourceRefusesPlainHttp PASSED
+
+AssetsTest > insufficientStorageIsReportedBeforeDownloading PASSED
+
+AssetsTest > manifestValidationRejectsUnsafeEntries PASSED
+
+AssetsTest > interruptedDownloadResumesWithRange PASSED
+
+AssetsTest > installsVerifiesAndReportsStatus PASSED
+
+AssetsTest > importChecksPinnedHashOrRecordsUserImport PASSED
+
+AssetsTest > corruptionAfterInstallIsDetected PASSED
+
+AssetsTest > packsInUseCannotBeDeletedOrReplaced PASSED
+
+> Task :engines:compileTestKotlin
+> Task :engines:compileTestJava NO-SOURCE
+> Task :engines:testClasses
+
+> Task :core:test
+
+AssetsTest > corruptedDownloadIsRejectedAndNotMarkedInstalled PASSED
+
+AssetsTest > unpinnedPacksAreNeverDownloaded PASSED
+
+AssetsTest > ggufHeaderIsParsed PASSED
+
+ShippedManifestTest > shippedManifestIsValidAndHonest PASSED
+
+ConversationSessionTest > wrongSecretIsRejectedByHost PASSED
+
+ConversationSessionTest > handshakeAuthenticatesAndDeliversBothDirections PASSED
+
+ConversationSessionTest > aDifferentGuestCannotTakeOverAnEstablishedSession PASSED
+
+ConversationSessionTest > languageUpdatesPropagate PASSED
+
+ConversationSessionTest > reconnectReplaysUnacknowledgedMessagesWithoutDuplicates PASSED
+
+LoopbackLatencyTest > deliveryLatencyOverLoopbackTls PASSED
+
+LanguageTest > thermalPolicyReducesWork PASSED
+
+LanguageTest > evictionKeepsTranslationResidentWhenPossible PASSED
+
+LanguageTest > uniqueScriptDetectionNeverGuessesSharedScripts PASSED
+
+LanguageTest > readinessRequiresInstalledVerifiedPacks PASSED
+
+LanguageTest > registryIsConsistent PASSED
+
+LanguageTest > scriptDetectionPicksSideOfPairOnlyWhenReliable PASSED
+
+ProtocolTest > codecRejectsMalformedUnknownAndOversized PASSED
+
+ProtocolTest > codecRoundTripsUnicode PASSED
+
+ProtocolTest > reliableTypesAreSequenced PASSED
+
+ProtocolTest > validatorAcceptsWellFormedMessages PASSED
+
+ProtocolTest > validatorRejectsBadMessages PASSED
+
+ReliabilityTest > recentIdsIsBounded PASSED
+
+ReliabilityTest > sequencerDeliversInOrderExactlyOnce PASSED
+
+ReliabilityTest > retriesThenGivesUp PASSED
+
+ReliabilityTest > queueAssignsSequenceAndAcknowledgesCumulatively PASSED
+
+PairingTest > shortAuthStringIsSixDigitsAndStable PASSED
+
+PairingTest > proofsBindSessionParticipantsAndFingerprints PASSED
+
+PairingTest > rejectsExpiredForeignAndIncompletePayloads PASSED
+
+PairingTest > qrPayloadRoundTrips PASSED
+
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+
+> Task :engines:test
+
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+
+> Task :core:test
+
+PairingTest > pairingCodesNormaliseAndDeriveDeterministically PASSED
+
+PairingTest > idsAreUniqueAndUrlSafe PASSED
+
+SpeechTest > twoPhrasesBecomeTwoUtterances PASSED
+
+SpeechTest > ignoresBackgroundNoiseAndShortClicks PASSED
+
+SpeechTest > pushToTalkFlushEndsUtterance PASSED
+
+SpeechTest > detectsOneUtteranceSurroundedBySilence PASSED
+
+SpeechTest > longSpeechIsForceSplitAndBounded PASSED
+
+SpeechTest > overlapMergeRemovesDuplicatedBoundaryWords PASSED
+
+SpeechTest > nonSpeechMarkersAreDetected PASSED
+
+TranslationTest > sanitizerStripsThinkingBlocksOnly PASSED
+
+TranslationTest > paragraphsAndLayoutArePreserved PASSED
+
+TranslationTest > promptUsesDocumentedTemplates PASSED
+
+TranslationTest > longParagraphSplitsAtSentenceBoundariesWithinLimit PASSED
+
+TranslationTest > joinUsesTranslatedPiecesAndOriginalSeparators PASSED
+
+TranslationTest > unpunctuatedTextFallsBackToWordsWithoutBreakingSurrogates PASSED
+
+TranslationTest > arabicAndCjkPunctuationAreBoundaries PASSED
+
+TranslationTest > blankInputHasNoPieces PASSED
+
+TranslationTest > shortTextIsOnePiece PASSED
+
+TlsTransportTest > framingRejectsOversizedAndTruncatedFrames PASSED
+
+TlsTransportTest > wrongPinnedFingerprintIsRejected PASSED
+
+TlsTransportTest > tlsOverRealLoopbackTcp PASSED
+
+TlsTransportTest > handshakeOverPipesExchangesFramesBothWays PASSED
+
+TlsTransportTest > guestWithoutClientCertificateIsRejected PASSED
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixaGenerateFontFromString: pix not made
+Error in bmfCreate: font pixa not made
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+Warning in changeFormatForMissingLib: png library missing; output bmp format
+[W/llama] llama_model_load: error loading model: tensor 'blk.0.ffn_down.weight' data is not within the file bounds, model is corrupted or incomplete
+
+[W/llama] llama_model_load_from_file_impl: failed to load model
+
+[W/llama] load: special_eos_id is not in special_eog_ids - the tokenizer config may be incorrect
+
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] .
+[W/llama] 
+
+[W/llama] graph_compute: ggml_backend_sched_graph_compute_async failed with error 1
+
+[W/llama] process_ubatch: failed to compute graph, compute status: 1
+
+[W/llama] decode: removing memory module entries for seq_id = 0, pos = [0, +inf)
+
+[W/llama] llama_decode: failed to decode, ret = 2
+
+
+> Task :engines:test
+
+OcrEngineTest > blankImageYieldsNoText PASSED
+
+OcrEngineTest > recognisesArabicText STANDARD_OUT
+    OCR ara: raw-cer=0.660 pipeline-cer=0.000 scale=0.50 passes=3 conf=92.1 time=158ms text= مرحبا بكم فيالمطعم |  الرجاء الانتظار حتى يتم تقديمالطعام
+
+OcrEngineTest > recognisesArabicText PASSED
+
+OcrEngineTest > invalidInputsAreRejectedWithoutCrashing PASSED
+
+OcrEngineTest > recognisesMixedArabicEnglishPage STANDARD_OUT
+      candidate layout@1.00 score=34.0: Exit |  |  مخرجالطوارئ | ‎Pharmacy open 24 hours‏
+      candidate layout@0.50 score=35.2: Exit |  ‏مخرجالطوارئ‎ | ‎Pharmacy open 24 hours
+      candidate bands(4)@1.00 score=32.1: Exit |  مخرجالطوارئ | Pharmacy open 24 hours
+    OCR mixed: cer=0.261 scale=0.50 conf=95.2 time=372ms text=Exit |  مخرجالطوارئ | Pharmacy open 24 hours
+      known limitation reproduced: Arabic line 'صيدلية مفتوحة' not recognised
+
+OcrEngineTest > recognisesMixedArabicEnglishPage PASSED
+
+OcrEngineTest > recognisesEnglishText STANDARD_OUT
+    OCR eng: cer=0.000 conf=96.4 time=74ms text=The quick brown fox jumps over the lazy dog. | Platform 4 departs at 10:35 for Cairo.
+
+OcrEngineTest > recognisesEnglishText PASSED
+
+TranslationEngineTest > rejectsNonGgufAndWrongArchitectureBeforeNativeLoad PASSED
+
+TranslationEngineTest > realModelTranslatesCorpus SKIPPED
+
+TranslationEngineTest > nativeLoaderRejectsTruncatedModelWithoutCrashing PASSED
+
+TranslationEngineTest > pipelineRunsEndToEndWithFixtureModel PASSED
+
+> Task :signaling:compileTestKotlin
+> Task :signaling:compileTestJava NO-SOURCE
+> Task :signaling:testClasses UP-TO-DATE
+
+> Task :signaling:test
+
+RelayTest > joinRateLimitPerIp PASSED
+
+RelayTest > serverFull PASSED
+
+RelayTest > twoPeersJoin PASSED
+
+RelayTest > thirdParticipantGetsRoomFull PASSED
+
+RelayTest > badFramesThenClose PASSED
+
+RelayTest > binaryFrameRejected PASSED
+
+RelayTest > joinRateLimitUsesForwardedForOnlyWhenTrusted PASSED
+
+RelayTest > oversizedFrameIsTooLarge PASSED
+
+RelayTest > messageRateLimit PASSED
+
+RelayTest > pingPong PASSED
+
+RelayTest > invalidRoomIdRejectedBeforeUpgrade PASSED
+
+RelayTest > peerLeftAndRoomFreed PASSED
+
+RelayTest > healthz PASSED
+
+RelayTest > idleRoomsAreClosed PASSED
+
+RelayTest > simultaneousJoinsAreSerialized PASSED
+
+RelayTest > signalRelayedVerbatim PASSED
+
+RelayTest > signalWithoutPeerIsNoPeer PASSED
+
+RelayTest > plainGetWithoutUpgrade PASSED
+
+UnitTest > shortHashIsShort PASSED
+
+UnitTest > keyedLimiterPrunesIdleKeys PASSED
+
+UnitTest > configFromEnv PASSED
+
+UnitTest > parsing PASSED
+
+UnitTest > slidingWindow PASSED
+
+BUILD SUCCESSFUL in 59s
+16 actionable tasks: 16 executed

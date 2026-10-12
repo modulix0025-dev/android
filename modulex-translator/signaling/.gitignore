@@ -1,0 +1,4 @@
+# Local secrets and keystores must never be committed.
+.env
+*.p12
+*.pfx

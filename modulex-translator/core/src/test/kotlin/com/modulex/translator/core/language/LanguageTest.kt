@@ -48,6 +48,17 @@ class LanguageTest {
         assertEquals("zh", (ScriptDetector.decideWithinPair("今天天气很好", zh, ja) as ScriptDetector.PairDecision.Detected).language.code)
     }
 
+    @Test
+    fun uniqueScriptDetectionNeverGuessesSharedScripts() {
+        assertEquals("ko", ScriptDetector.detectUnique("안녕하세요")?.code)
+        assertEquals("th", ScriptDetector.detectUnique("สวัสดีครับ")?.code)
+        assertEquals("he", ScriptDetector.detectUnique("שלום עולם")?.code)
+        assertEquals("ja", ScriptDetector.detectUnique("東京へ行きます")?.code)
+        assertEquals(null, ScriptDetector.detectUnique("Hello world"))
+        assertEquals(null, ScriptDetector.detectUnique("مرحبا"), "Arabic script is shared by ar/fa/ur/ug")
+        assertEquals(null, ScriptDetector.detectUnique("你好"), "Han is shared by zh/zh-Hant/yue")
+    }
+
     private val sha = "0".repeat(64)
     private val manifest = AssetManifest(1, listOf(
         AssetPack("mt", PackKind.TRANSLATION_MODEL, "Translation", "1", emptyList(), listOf(AssetFile("m.gguf", "https://x/m", 10, sha)), "u", "l", "a"),
