@@ -1,0 +1,17 @@
+src	tgt	text	reference	category
+ar	en	مرحبا، كيف حالك؟	Hello, how are you?	short-conversational
+ar	en	أين أقرب صيدلية؟	Where is the nearest pharmacy?	short-conversational
+ar	en	أريد حجز طاولة لشخصين الساعة الثامنة مساءً.	I would like to book a table for two at eight in the evening.	numbers-time
+ar	en	وصلت الطائرة في الخامس عشر من مارس ٢٠٢٤ الساعة ١٠:٣٠.	The plane arrived on March 15, 2024 at 10:30.	numbers-dates
+ar	en	اسمي أحمد وأعمل مهندساً في القاهرة.	My name is Ahmed and I work as an engineer in Cairo.	names
+ar	en	هل يمكنك أن تتكلم ببطء من فضلك؟	Could you speak slowly, please?	short-conversational
+ar	en	الاجتماع غداً، لكن لم نحدد المكان بعد. سأرسل لك التفاصيل لاحقاً.	The meeting is tomorrow, but we haven't decided on the place yet. I will send you the details later.	multi-sentence
+ar	en	انا عايز اروح المطار بسرعه	I want to go to the airport quickly	asr-style-no-punctuation-egyptian
+en	ar	Hello, how are you?	مرحبا، كيف حالك؟	short-conversational
+en	ar	Where is the nearest pharmacy?	أين أقرب صيدلية؟	short-conversational
+en	ar	The train leaves at 7:45 from platform 3.	يغادر القطار الساعة ٧:٤٥ من الرصيف ٣.	numbers-time
+en	ar	Please send the invoice to Sarah Johnson before Friday, June 6.	يرجى إرسال الفاتورة إلى سارة جونسون قبل يوم الجمعة ٦ يونيو.	names-dates
+en	ar	I don't eat meat; do you have vegetarian dishes?	أنا لا آكل اللحم؛ هل لديكم أطباق نباتية؟	punctuation
+en	ar	The new Wi-Fi password is on the card next to the router.	كلمة مرور الواي فاي الجديدة موجودة على البطاقة بجوار جهاز التوجيه.	mixed-terms
+en	ar	i think we should leave now its getting late	أعتقد أنه يجب أن نغادر الآن، فقد تأخر الوقت	asr-style-no-punctuation
+en	ar	Our hotel is located in the historic center. Breakfast is served from 6 to 10 a.m., and check-out is at noon. If you need a taxi to the airport, the front desk can arrange one for you.	يقع فندقنا في المركز التاريخي. يُقدَّم الإفطار من الساعة ٦ إلى ١٠ صباحاً، وموعد المغادرة عند الظهر. إذا كنت بحاجة إلى سيارة أجرة إلى المطار، يمكن لمكتب الاستقبال ترتيبها لك.	paragraph
