@@ -29,6 +29,19 @@ class DialectHeldOutExperiment {
             TranslationMemory.parseTsv(f.readText(), lang, if (lang == "en") "ar" else "en")
         }
 
+    /**
+     * Extra evaluation-only pairs, e.g. FLORES+ fetched locally (its gate forbids re-hosting, so it is never
+     * shipped or committed): -Pmodulex.tmEvalExtra=/path/to/data/tm-raw/flores, raw tools/tm_sources.py format
+     * (id, source, standard, en, provenance, licence). Reported as "<dir>:<dialect>"; never used as references.
+     */
+    private fun evaluationOnly(): List<TranslationMemory.Entry> {
+        val dir = System.getProperty("modulex.tmEvalExtra")?.let(::File)?.takeIf { it.isDirectory } ?: return emptyList()
+        return dir.listFiles { f -> f.name.endsWith(".tsv") && f.name.count { it == '.' } == 1 }.orEmpty().flatMap { f ->
+            f.readLines().map { it.split('\t') }.filter { it.size == 6 && it[3].isNotBlank() }
+                .map { TranslationMemory.Entry(it[0], "${dir.name}:${f.name.removeSuffix(".tsv")}", it[1], mapOf("en" to it[3])) }
+        }
+    }
+
     private val glossary: Glossary by lazy {
         Glossary(File("../app/src/main/assets/glossary").listFiles { f -> f.name.endsWith(".tsv") }!!.flatMap { f ->
             val (from, to) = f.name.substringBefore(".").split("-") // <from>-<to>[.<list>].tsv
@@ -41,7 +54,8 @@ class DialectHeldOutExperiment {
         val model = System.getProperty("modulex.mtEvalModels")?.split(",")?.map { it.trim() }?.firstOrNull { File(it).isFile }
         assumeTrue("set -Pmodulex.mtEvalModels", model != null)
         val memory = TranslationMemory(shipped("../app/src/main/assets/tm"))
-        val heldout = shipped("src/test/resources/tm-heldout").filter { TranslationMemory.baseLang(it.dialect) == "ar" }
+        val heldout = shipped("src/test/resources/tm-heldout").filter { TranslationMemory.baseLang(it.dialect) == "ar" } +
+            evaluationOnly()
         assumeTrue("no held-out pairs", heldout.isNotEmpty())
         val engine = LocalTranslationEngine(expectedArchitecture = null)
         engine.load(model!!, Runtime.getRuntime().availableProcessors().coerceAtMost(4), 2048).getOrThrow()

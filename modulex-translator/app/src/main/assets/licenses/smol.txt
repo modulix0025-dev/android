@@ -1,0 +1,8 @@
+Dialect sentence pairs from Google SMOL (https://huggingface.co/datasets/google/smol)
+
+SMOL (SmolSent, SmolDoc) and GATITOS are professionally translated data published by Google under the
+Creative Commons Attribution 4.0 International licence (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+Attribution: every pair taken from SMOL names its subset, the dataset revision and the item id in its
+"provenance" field. The pairs were selected (length, script, duplicate checks) but not modified.

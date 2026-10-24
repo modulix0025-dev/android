@@ -37,7 +37,14 @@ every candidate). Every pair records its provenance and licence in its own row.
 |--------|---------|--------|-------|
 | Tatoeba (tatoeba.org), dialect sentences and linked translations | CC BY 2.0 FR | **shipped** | Attribution per pair: sentence ids and contributor usernames in `provenance`. |
 | Wiktionary usage examples (via kaikki.org / wiktextract) | CC BY-SA 4.0 (+ GFDL) | **shipped** | Share-alike applies to the corpus files that contain these rows (not to app code). |
-| FLORES+ (`openlanguagedata/flores_plus`) | CC BY-SA 4.0 (dataset card) | not shipped | Gated on Hugging Face; needs an accepted gate and an `HF_TOKEN` secret; gate terms to be read first. |
+| OLDI Seed (`openlanguagedata/oldi_seed`), Egyptian and Moroccan | CC BY-SA 4.0 | **shipped** | Expert translations of English Wikipedia sentences; not gated; meant for training MT. Share-alike on the corpus files. |
+| Google SMOL (`google/smol`): SmolSent, SmolDoc | CC BY 4.0 | **shipped** | Professional translations from English (Egyptian, Levantine, Tunisian, Sudanese, Libyan). GATITOS lexicon fetched, not yet used. |
+| `lahga/arabic-dialects`, Medical-Questionnaire-Multilingual-Translation | CC BY-SA 4.0 / CC BY 4.0 (cards) | not shipped | Provenance of the rows to be checked from samples first. |
+| `algerian-nlp/algerian-arabic-english-translation-50k` | Apache-2.0 (card) | not shipped | The card says rows carry no source, licence or translator; origin cannot be verified. |
+| `IbrahimAmin/arz-en-parallel-corpus` | MIT (card) | excluded | Merges ArzEn-MultiGenre subtitles; third-party copyright cannot be relicensed. |
+| Machine-generated sets (FREAD, TinyStories-Algerian-Darija, tunis-ai MSA-Tunisian, Adaption, ArabCulture-Dialogue) and Global PIQA | various | excluded | Model-written translations, or a benchmark that forbids AI training. |
+| Ungated FLORES-200 copies (`Muennighoff/flores200`, `mteb/flores`, ...) | CC BY-SA 4.0 | excluded | Would sidestep the OLDI request not to re-host FLORES. |
+| FLORES+ (`openlanguagedata/flores_plus`) | CC BY-SA 4.0 (dataset card) + gate terms | not shipped | Gate: "I agree not to re-host FLORES+ in places where it could be picked up by web crawlers" and keep it out of training data. A public repository/APK would re-host it, so it is used for local evaluation only (`docs/LOCAL_HF_SOURCES_PROMPT.md`). |
 | Darija Open Dataset (DODa) | **CC BY-NC 4.0** (LICENSE file) | excluded | Non-commercial; the README asks commercial users to contact the authors. |
 | ArzEn-MultiGenre (Mendeley Data) | CC BY 4.0 (dataset page) | not shipped | Segments are taken from published song lyrics, novels and subtitles whose copyright is not the dataset authors'. Owner decision. |
 | PADIC | unknown | not shipped | Licence page not reachable from CI. |

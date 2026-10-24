@@ -8,3 +8,6 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+
+# Gated evaluation data fetched locally (FLORES+ gate: must not be re-hosted where crawlers can reach it)
+/data/tm-raw/flores/

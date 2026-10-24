@@ -16,10 +16,26 @@
    "share_alike": "the shipped tm/*.tsv files that contain Wiktionary rows are themselves CC BY-SA 4.0",
    "domain": "dictionary-example"
   },
+  "oldi_seed": {
+   "approved": true,
+   "license": "CC-BY-SA-4.0",
+   "attribution": "OLDI Seed, Open Language Data Initiative (https://oldi.org); NLLB Seed authors",
+   "evidence": "dataset card: 'licensed under CC BY-SA 4.0', 'expert-generated', 'intended to be used to kick-start machine translation models'; not gated",
+   "share_alike": "the corpus files that contain these rows are CC BY-SA 4.0",
+   "domain": "wikipedia"
+  },
+  "smol": {
+   "approved": true,
+   "license": "CC-BY-4.0",
+   "attribution": "Google SMOL / GATITOS (https://huggingface.co/datasets/google/smol)",
+   "evidence": "dataset card: '## License This data is released under cc-by-4.0'; professional translations from English (SmolSent, SmolDoc; SmolDoc English sides were model-written, the translations are human)",
+   "domain": "general"
+  },
   "flores": {
    "approved": false,
    "license": "CC-BY-SA-4.0 (dataset card)",
-   "reason": "gated on Hugging Face: needs an HF_TOKEN secret and acceptance of the gate terms, which must be read first"
+   "gate": "Protecting the integrity of FLORES+ for evaluation: 'I agree not to re-host FLORES+ in places where it could be picked up by web crawlers'; 'If I evaluate using FLORES+, I will ensure that its contents are not in the training data'",
+   "reason": "the gate forbids re-hosting where crawlers can reach it; a public repository and a public APK would do that. Local evaluation only (docs/LOCAL_HF_SOURCES_PROMPT.md); never committed (data/tm-raw/flores is git-ignored)"
   },
   "doda": {
    "approved": false,
@@ -31,10 +47,56 @@
    "license": "CC-BY-4.0 (Mendeley Data page)",
    "reason": "segments come from published song lyrics, novels and film subtitles whose copyright is not the dataset authors'; owner decision pending"
   },
-  "padic": {"approved": false, "reason": "licence page not reachable from CI (smart.loria.fr timed out, sourceforge 403)"},
-  "lisan": {"approved": false, "reason": "licence page not reachable from CI; word-level glosses only, no sentence translations"},
-  "madar": {"approved": false, "license": "research / non-commercial", "reason": "not allowed in a commercial app"},
-  "ufal-north-levantine": {"approved": false, "license": "CC-BY-NC-SA-4.0", "reason": "non-commercial"},
-  "nadi": {"approved": false, "license": "research only", "reason": "not allowed in a commercial app"}
+  "padic": {
+   "approved": false,
+   "reason": "licence page not reachable from CI (smart.loria.fr timed out, sourceforge 403)"
+  },
+  "lisan": {
+   "approved": false,
+   "reason": "licence page not reachable from CI; word-level glosses only, no sentence translations"
+  },
+  "madar": {
+   "approved": false,
+   "license": "research / non-commercial",
+   "reason": "not allowed in a commercial app"
+  },
+  "ufal-north-levantine": {
+   "approved": false,
+   "license": "CC-BY-NC-SA-4.0",
+   "reason": "non-commercial"
+  },
+  "nadi": {
+   "approved": false,
+   "license": "research only",
+   "reason": "not allowed in a commercial app"
+  },
+  "lahga": {
+   "approved": false,
+   "license": "CC-BY-SA-4.0 (card)",
+   "reason": "aggregates other lexicons and Wiktionary extracts; provenance of its examples must be checked first (job tm-sources prints samples)"
+  },
+  "medical-questionnaire": {
+   "approved": false,
+   "license": "CC-BY-4.0 (card)",
+   "reason": "card does not say who translated; samples printed by tm-sources for review"
+  },
+  "algerian-50k": {
+   "approved": false,
+   "license": "Apache-2.0 (card)",
+   "reason": "card states rows have no source id, licence or translator; origin cannot be verified"
+  },
+  "ibrahimamin-arz-en": {
+   "approved": false,
+   "license": "MIT (card)",
+   "reason": "merge that includes ArzEn-MultiGenre subtitles; third-party copyright cannot be relicensed as MIT"
+  },
+  "synthetic-sets": {
+   "approved": false,
+   "reason": "FREAD (GPT-4o), TinyStories-Algerian-Darija, tunis-ai MSA-Tunisian, Adaption, ArabCulture-Dialogue (GPT-5 drafts): machine-generated; Global PIQA forbids AI training"
+  },
+  "flores-copies": {
+   "approved": false,
+   "reason": "ungated re-uploads of FLORES-200 (Muennighoff/flores200, mteb/flores, ...): would sidestep the OLDI request not to re-host it"
+  }
  }
 }

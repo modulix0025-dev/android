@@ -1,0 +1,11 @@
+Dialect sentence pairs from OLDI Seed (https://huggingface.co/datasets/openlanguagedata/oldi_seed)
+
+OLDI Seed is managed by the Open Language Data Initiative (https://oldi.org) and is an updated version of
+the NLLB Seed dataset ("Small Data, Big Impact: Leveraging Minimal Data for Effective Machine
+Translation", ACL 2023). Its expert translations of English Wikipedia sentences are released under the
+Creative Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0):
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Attribution: every pair taken from OLDI Seed names the dataset revision and the sentence id in its
+"provenance" field. Share-alike: the corpus files that contain these rows (assets/tm/*.tsv) are licensed
+under CC BY-SA 4.0. This applies to those data files only, not to the application code.

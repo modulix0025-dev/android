@@ -9,6 +9,7 @@ Every pair must pass, in this order (the report counts each rejection reason):
   same-as-std   source identical to its standard-language side (not dialect data)
   exact-dup     normalised source already kept (any source, any split)
   near-dup      word-3-gram Jaccard >= 0.8 with a kept source of the same dialect
+  looks-msa     no dialect term and >= 90% of the words are common MSA (Tatoeba MSA frequency): not dialect data
 Terms: dialect lemmas (Wiktionary, approved) that occur in the source, matched like core Glossary.kt.
 Split: a stable 10% (by hash of the normalised source) is held out for evaluation and never shipped
 as a reference; it goes to engines/src/test/resources/tm-heldout/.
@@ -40,7 +41,7 @@ SKIP_TAGS = {"form-of", "alt-of", "plural", "obsolete", "archaic", "rare", "abbr
              "derogatory", "offensive"}
 APPROVED = os.path.join(os.path.dirname(__file__), "tm_sources_approved.json")
 HEADER = ["id", "dialect", "source", "standard", "en", "terms", "domain", "provenance", "license"]
-SOURCE_ORDER = ["flores", "tatoeba", "doda", "kaikki"]  # earlier sources win exact/near duplicates
+SOURCE_ORDER = ["flores", "oldi_seed", "smol", "tatoeba", "doda", "kaikki"]  # earlier sources win exact/near duplicates
 
 AR_PREFIX = r"(?<![^\W\d_])(?:و|ف)?(?:ب|ل|ك)?(?:ال|ل)?"
 AR_SUFFIX = r"(?:ات|ان|ين|ون|ا|ي|ه|ها|هم|هن|كم|نا|ك)?(?![^\W\d_])"
@@ -77,6 +78,7 @@ def heldout(norm):
     return int(hashlib.sha1(norm.encode()).hexdigest()[:8], 16) % 10 == 0
 
 
+MSA_SHARE = 0.9  # a sentence without any dialect term whose words are this much common MSA is rejected as MSA
 MSA_MAX = 3  # a lemma found in more than this many Tatoeba MSA sentences is an ordinary MSA word, not a marker
 
 
@@ -105,7 +107,8 @@ def load_terms(raw, dialect, approved, msa):
 
 def build_dialect(raw, dialect, approved, domains):
     arabic = dialect.startswith("ar")
-    terms = [(t, term_regex(t)) for t in load_terms(raw, dialect, approved, msa_words(raw))]
+    msa = msa_words(raw)
+    terms = [(t, term_regex(t)) for t in load_terms(raw, dialect, approved, msa)]
     kept, held, reasons = [], [], {}
     seen, index, grams_of = set(), {}, []
 
@@ -132,6 +135,15 @@ def build_dialect(raw, dialect, approved, domains):
                 reject("same-as-std"); continue
             if norm in seen:
                 reject("exact-dup"); continue
+            gnorm = glossary_norm(src)
+            found = []
+            for t, rx in terms:
+                if len(found) == 5:
+                    break
+                if rx.search(gnorm) and not any(t in f for f in found):
+                    found.append(t)
+            if arabic and msa and not found and sum(1 for w in ws if msa.get(w, 0) >= 2) >= MSA_SHARE * len(ws):
+                reject("looks-msa"); continue  # no dialect marker and nearly every word is common MSA
             g = trigrams(ws)
             cand = set()
             for x in g:
@@ -142,13 +154,6 @@ def build_dialect(raw, dialect, approved, domains):
             for x in g:
                 index.setdefault(x, []).append(len(grams_of))
             grams_of.append(g)
-            gnorm = glossary_norm(src)
-            found = []
-            for t, rx in terms:
-                if len(found) == 5:
-                    break
-                if rx.search(gnorm) and not any(t in f for f in found):
-                    found.append(t)
             rid = f"{dialect}-{source}-{hashlib.sha1(norm.encode()).hexdigest()[:10]}"
             out = [rid, dialect, src, std, en, ";".join(found), domains.get(source, "general"), prov, lic]
             (held if heldout(norm) else kept).append(out)

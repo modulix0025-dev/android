@@ -51,6 +51,8 @@ DIALECTS = {
 LICENCE_PAGES = {
     "tatoeba": ["https://tatoeba.org/en/terms_of_use", "https://tatoeba.org/en/downloads"],
     "kaikki": ["https://en.wiktionary.org/wiki/Wiktionary:Copyrights", "https://kaikki.org/dictionary/rawdata.html"],
+    "oldi_seed": ["https://huggingface.co/datasets/openlanguagedata/oldi_seed/raw/main/README.md"],
+    "smol": ["https://huggingface.co/datasets/google/smol/raw/main/README.md"],
     "flores": [],  # gated on Hugging Face: the dataset card fields (licence, gate prompt) are printed by flores()
     "doda": ["https://raw.githubusercontent.com/darija-open-dataset/dataset/main/LICENSE"],
     "arzen-multigenre": ["https://data.mendeley.com/datasets/6k97jty9xg/4"],
@@ -160,6 +162,126 @@ def flores(out, cache):
     return {"revision": info.sha, "counts": counts}
 
 
+# ---------------------------------------------------------------------------------------------- public Hugging Face sets
+def hf_files(repo, token=None):
+    from huggingface_hub import HfApi
+    info = HfApi().dataset_info(repo, token=token)
+    files = HfApi().list_repo_files(repo, repo_type="dataset", revision=info.sha, token=token)
+    card = info.card_data.to_dict() if info.card_data else {}
+    print(f"{repo} revision {info.sha} gated={getattr(info, 'gated', None)} license={card.get('license')}")
+    return info.sha, files
+
+
+def hf_rows(repo, path, sha, cache):
+    """Rows of one parquet / jsonl / tsv file as dicts."""
+    from huggingface_hub import hf_hub_download
+    local = hf_hub_download(repo, path, repo_type="dataset", revision=sha, cache_dir=os.path.join(cache, "hf"))
+    if path.endswith(".parquet"):
+        import pyarrow.parquet as pq
+        return pq.read_table(local).to_pylist()
+    text = open(local, encoding="utf-8").read()
+    if path.endswith(".jsonl"):
+        return [json.loads(l) for l in text.splitlines() if l.strip()]
+    if path.endswith(".json"):
+        d = json.loads(text)
+        return d if isinstance(d, list) else [d]
+    lines = [l.split("\t") for l in text.splitlines() if l.strip()]
+    return [dict(zip(lines[0], l)) for l in lines[1:]] if lines else []
+
+
+def show(repo, path, rows):
+    print(f"   {path}: {len(rows)} rows, keys={list(rows[0].keys()) if rows else []}")
+    for r in rows[:2]:
+        print("      " + json.dumps(r, ensure_ascii=False)[:400])
+
+
+def code_in(path, code):
+    return re.search(rf"(?<![a-z]){code}(?![a-z])", os.path.basename(path).lower()) is not None
+
+
+def oldi_seed(out, cache):
+    """OLDI Seed (expert translations of English Wikipedia sentences); aligned to English by id."""
+    repo = "openlanguagedata/oldi_seed"
+    sha, files = hf_files(repo)
+    data = [f for f in files if f.endswith((".parquet", ".jsonl", ".tsv")) and not f.startswith("dataset_cards")]
+    print(f"   data files: {data[:12]} ... ({len(data)})")
+
+    def load(code):
+        rows = {}
+        for f in data:
+            if code in f:
+                rs = hf_rows(repo, f, sha, cache)
+                show(repo, f, rs)
+                for i, r in enumerate(rs):
+                    rows[str(r.get("id", i))] = r.get("text") or r.get("sentence") or ""
+        return rows
+
+    eng = load("eng_Latn")
+    counts = {}
+    for tag, code in (("ar-EG", "arz_Arab"), ("ar-MA", "ary_Arab")):
+        rows = load(code)
+        write_rows(f"{out}/oldi_seed/{tag}.tsv", [[k, t, "", eng.get(k, ""), f"OLDI Seed {sha[:12]} id {k}", "CC-BY-SA-4.0"]
+                                                  for k, t in sorted(rows.items())])
+        counts[tag] = {"rows": len(rows), "with_en": sum(1 for k in rows if eng.get(k))}
+    return {"revision": sha, "counts": counts}
+
+
+SMOL_CODES = {"arz": "ar-EG", "apc": "ar-LB", "aeb": "ar-TN", "apd": "ar-SD", "ayl": "ar-LY"}
+
+
+def smol(out, cache):
+    """Google SMOL: SmolSent / SmolDoc human translations from English, and the GATITOS lexicon."""
+    repo = "google/smol"
+    sha, files = hf_files(repo)
+    pairs, terms, counts = {}, {}, {}
+    for f in files:
+        code = next((c for c in SMOL_CODES if code_in(f, c)), None)
+        if not code or not f.endswith((".jsonl", ".parquet", ".tsv", ".json")):
+            continue
+        tag = SMOL_CODES[code]
+        rows = hf_rows(repo, f, sha, cache)
+        show(repo, f, rows)
+        part = f.split("/")[0]
+        for i, r in enumerate(rows):
+            src, trg = r.get("src"), r.get("trg")
+            if isinstance(r.get("srcs"), list) and isinstance(r.get("trgs"), list) and len(r["srcs"]) == len(r["trgs"]):
+                items = list(zip(r["srcs"], r["trgs"]))
+            elif isinstance(src, str) and isinstance(trg, str):
+                items = [(src, trg)]
+            else:
+                continue
+            for j, (en, dia) in enumerate(items):
+                # SMOL translates from English: src is English, trg the dialect (check the printed samples).
+                row = [f"{part}:{r.get('id', i)}:{j}", dia, "", en, f"Google SMOL {part} ({sha[:12]}) {r.get('id', i)}", "CC-BY-4.0"]
+                (terms if part == "gatitos" else pairs).setdefault(tag, []).append(row)
+    for tag in SMOL_CODES.values():
+        write_rows(f"{out}/smol/{tag}.tsv", pairs.get(tag, []))
+        write_rows(f"{out}/smol/{tag}.lexicon.tsv", [[r[1], r[3]] for r in terms.get(tag, [])])
+        counts[tag] = {"pairs": len(pairs.get(tag, [])), "lexicon": len(terms.get(tag, []))}
+    return {"revision": sha, "counts": counts}
+
+
+def review_only_hf(out, cache):
+    """Datasets whose provenance must be seen before approval: list files and print samples, write nothing."""
+    for repo, pattern in (("lahga/arabic-dialects", r"examples|entries|dialects"),
+                          ("jonathanmutal/Medical-Questionnaire-Multilingual-Translation", r"translations")):
+        try:
+            sha, files = hf_files(repo)
+            for f in files:
+                if re.search(pattern, f) and f.endswith((".jsonl", ".tsv", ".parquet")):
+                    rows = hf_rows(repo, f, sha, cache)
+                    show(repo, f, rows)
+                    for r in rows[len(rows) // 2: len(rows) // 2 + 6]:
+                        print("      " + json.dumps(r, ensure_ascii=False)[:400])
+            card = get(f"https://huggingface.co/datasets/{repo}/raw/main/README.md", cache, retries=2, timeout=40)
+            for l in (card or b"").decode("utf-8", "replace").splitlines():
+                if re.search(r"source|provenance|licen|translat|annotat|generated|native", l, re.I):
+                    print("   | " + " ".join(l.split())[:300])
+        except Exception as e:
+            print(f"{repo}: {type(e).__name__}: {e}")
+    return {}
+
+
 # ---------------------------------------------------------------------------------------------- Tatoeba
 TATOEBA = "https://downloads.tatoeba.org/exports/per_language"
 
@@ -244,8 +366,14 @@ def kaikki(out, cache):
                 glosses = sense.get("glosses") or []
                 if glosses:
                     terms.append([word, e.get("pos", ""), glosses[-1], ";".join(sense.get("tags", []))])
+                if set(sense.get("tags", [])) & UNWANTED_SENSES:
+                    continue
                 for j, ex in enumerate(sense.get("examples", [])):
                     en = ex.get("english") or ex.get("translation") or ""
+                    # Only examples written by Wiktionary editors are CC BY-SA. Quotations of books, songs or news
+                    # (type "quotation", or any example with a "ref") stay under their authors' copyright.
+                    if ex.get("type") == "quotation" or ex.get("ref"):
+                        continue
                     if ex.get("text") and en:
                         pairs.append([f"{word}#{i}.{j}", ex["text"], "", en,
                                       f"Wiktionary contributors, entry «{word}» (en.wiktionary.org, via kaikki.org)", "CC-BY-SA-4.0"])
@@ -255,7 +383,10 @@ def kaikki(out, cache):
     return {"counts": counts}
 
 
-FETCHERS = {"flores": flores, "tatoeba": tatoeba, "kaikki": kaikki}
+UNWANTED_SENSES = {"vulgar", "offensive", "derogatory", "slur", "ethnic", "sexual"}
+
+FETCHERS = {"flores": flores, "tatoeba": tatoeba, "kaikki": kaikki, "oldi_seed": oldi_seed, "smol": smol,
+            "hf_review": review_only_hf}
 # Licence evidence printed, data not fetched: DODa is CC BY-NC 4.0; the others are unresolved.
 REVIEW_ONLY = ["doda", "arzen-multigenre", "padic", "lisan"]
 
