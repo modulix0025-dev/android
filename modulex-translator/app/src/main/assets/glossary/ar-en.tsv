@@ -1,0 +1,138 @@
+# Arabic -> English terminology hints for the offline translator (see core Glossary).
+# One entry per line: <Arabic term><TAB><English rendering>. Matching ignores diacritics, alef/yaa
+# variants, the article and clitic prefixes (و ف ب ك ل ال) and common endings, so list the bare word.
+# Only unambiguous terms belong here: a word with several everyday meanings is left to the model.
+
+# Currencies
+جنيه	pound
+جنيه مصري	Egyptian pound
+جنيه إسترليني	pound sterling
+جنيه سوداني	Sudanese pound
+مليم	millieme
+ريال	riyal
+ريال سعودي	Saudi riyal
+ريال قطري	Qatari riyal
+ريال عماني	Omani rial
+ريال يمني	Yemeni rial
+درهم	dirham
+درهم إماراتي	UAE dirham
+درهم مغربي	Moroccan dirham
+دينار	dinar
+دينار كويتي	Kuwaiti dinar
+دينار أردني	Jordanian dinar
+دينار بحريني	Bahraini dinar
+دينار عراقي	Iraqi dinar
+دينار تونسي	Tunisian dinar
+دينار جزائري	Algerian dinar
+دينار ليبي	Libyan dinar
+ليرة لبنانية	Lebanese pound
+ليرة سورية	Syrian pound
+ليرة تركية	Turkish lira
+فلس	fils
+هللة	halala
+روبية	rupee
+دولار	dollar
+يورو	euro
+
+# Religious and cultural terms
+الصدقة الجارية	ongoing charity
+صدقة جارية	ongoing charity
+صدقة	charity
+زكاة	zakat
+زكاة الفطر	zakat al-fitr
+كفارة	expiation
+صلاة الفجر	the dawn prayer
+صلاة الظهر	the noon prayer
+صلاة العصر	the afternoon prayer
+صلاة المغرب	the sunset prayer
+صلاة العشاء	the night prayer
+صلاة الجمعة	Friday prayer
+خطبة الجمعة	Friday sermon
+التراويح	Tarawih prayers
+الوضوء	ablution
+مؤذن	muezzin
+الحج	Hajj
+العمرة	Umrah
+عمرة	Umrah
+الإحرام	ihram
+الطواف	circumambulation of the Kaaba
+أضحية	sacrificial animal
+عيد الفطر	Eid al-Fitr
+عيد الأضحى	Eid al-Adha
+رمضان	Ramadan
+السحور	suhoor
+وقف خيري	charitable endowment
+الوقف الخيري	charitable endowment
+صلة الرحم	maintaining family ties
+الميراث	inheritance
+المهر	dowry
+العقيقة	aqiqah
+الدية	blood money
+حلال	halal
+القرآن	the Quran
+المصحف	copy of the Quran
+إن شاء الله	God willing
+الحمد لله	thank God
+صايم	fasting
+صائم	fasting
+
+# Food and drink (Egypt and the region)
+عيش بلدي	Egyptian flatbread
+رغيف عيش	loaf of bread
+فول	fava beans
+فول مدمس	ful medames
+فول سوداني	peanuts
+طعمية	falafel
+فلافل	falafel
+كشري	koshari
+ملوخية	molokhia
+محشي	stuffed vegetables
+فطير	feteer pastry
+بسبوسة	basbousa
+كنافة	kunafa
+قطايف	qatayef
+سحلب	sahlab
+كركديه	hibiscus tea
+عرقسوس	licorice drink
+عصير قصب	sugarcane juice
+شاورما	shawarma
+فتة	fatteh
+مسقعة	moussaka
+جبنة قريش	cottage cheese
+
+# Everyday words (often Egyptian colloquial)
+أسانسير	elevator
+تكييف	air conditioning
+جرسون	waiter
+بقشيش	tip
+عربون	deposit
+كمساري	bus conductor
+ميكروباص	minibus
+توك توك	tuk-tuk
+بواب	doorman
+سباك	plumber
+فكة	small change
+روشتة	prescription
+أجزخانة	pharmacy
+موبايل	mobile phone
+كوبري	bridge
+ميعاد	appointment
+فاتورة	bill
+إيصال	receipt
+إيجار	rent
+سمسار	broker
+شنطة	bag
+بنطلون	trousers
+
+# Documents, offices, family occasions
+الرقم القومي	national ID number
+بطاقة شخصية	national ID card
+بطاقة الرقم القومي	national ID card
+شهادة ميلاد	birth certificate
+الشهر العقاري	real estate registry office
+قسم الشرطة	police station
+بطاقة التموين	ration card
+الثانوية العامة	general secondary certificate
+خطوبة	engagement
+كتب الكتاب	marriage contract signing
+حماتي	my mother-in-law
