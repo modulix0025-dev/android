@@ -167,4 +167,40 @@ class ConversationSessionTest {
             a.cancel(); b.cancel()
         }
     }
+
+    /** Lets [allowedSends] frames through, then fails like a link that has just dropped. */
+    private class DroppingChannel(private val inner: FrameChannel, private var allowedSends: Int) : FrameChannel by inner {
+        override suspend fun send(frame: ByteArray) {
+            if (allowedSends-- <= 0) { inner.close(); throw java.io.IOException("stream closed") }
+            inner.send(frame)
+        }
+    }
+
+    @Test
+    fun linkDroppingWhileReplayingIsReportedAsClosedAndKeepsTheQueue() = runBlocking {
+        withTimeout(30_000) {
+            val (h, g) = sessions()
+            val (hc1, gc1) = TestTls.connect(hostId, guestId)
+            val (a1, b1) = attachBoth(h, g, hc1, gc1)
+            g.state.first { it is LinkState.Connected }
+            gc1.close(); hc1.close(); a1.join(); b1.join()
+            g.sendUtterance("queued", "en", "ar", null)
+
+            // Reconnect, but the link drops right after the guest's HELLO, during the replay.
+            val (hc2, gc2) = TestTls.connect(hostId, guestId)
+            val hr = async(Dispatchers.IO) { h.attach(hc2) }
+            val gr = async(Dispatchers.IO) { g.attach(DroppingChannel(gc2, allowedSends = 1)) }
+            assertEquals(ConversationSession.AttachResult.ChannelClosed, gr.await())
+            hr.await()
+            assertIs<LinkState.Interrupted>(g.state.value)
+            assertEquals(1, g.pendingOutbound)
+
+            // The next link delivers the queued message.
+            val received = async(start = CoroutineStart.UNDISPATCHED) { h.events.filterIsInstance<SessionEvent.Received>().first() }
+            val (hc3, gc3) = TestTls.connect(hostId, guestId)
+            val (a3, b3) = attachBoth(h, g, hc3, gc3)
+            assertEquals("queued", received.await().message.translatedText)
+            a3.cancel(); b3.cancel()
+        }
+    }
 }

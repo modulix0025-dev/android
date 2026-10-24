@@ -19,6 +19,7 @@ interface FrameChannel : Closeable {
     /** Human-readable transport label for diagnostics ("LAN", "Bluetooth", ...). */
     val label: String
 
+    /** Sends one frame. Throws [java.io.IOException] once the channel is closed. */
     suspend fun send(frame: ByteArray)
 
     /** Next frame, or null once the channel is closed by either side. */

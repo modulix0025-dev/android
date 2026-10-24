@@ -110,9 +110,16 @@ class ConversationSession(
     suspend fun attach(ch: FrameChannel): AttachResult {
         if (ended) { ch.close(); return AttachResult.SessionEnded }
         _state.value = LinkState.Handshaking
-        val hs = withTimeoutOrNull(timings.handshakeTimeoutMs) {
-            if (role == Role.GUEST) guestHandshake(ch) else hostHandshake(ch)
-        } ?: HandshakeResult.Failed("handshake timed out")
+        val hs = try {
+            withTimeoutOrNull(timings.handshakeTimeoutMs) {
+                if (role == Role.GUEST) guestHandshake(ch) else hostHandshake(ch)
+            } ?: HandshakeResult.Failed("handshake timed out")
+        } catch (e: java.io.IOException) {
+            // The link dropped mid-handshake: a lost connection, not a rejection.
+            ch.close()
+            _state.value = LinkState.Interrupted("connection lost")
+            return AttachResult.ChannelClosed
+        }
         if (hs is HandshakeResult.Failed) {
             ch.close()
             _state.value = LinkState.Interrupted(hs.reason)
@@ -128,14 +135,16 @@ class ConversationSession(
         _state.value = LinkState.Connected(ch.label, sas, hs.peer)
         _events.emit(SessionEvent.PeerJoined(peerId!!, hs.peer, sas, hs.rejoin))
 
-        // Peer told us what it already has; replay the rest in order.
-        lock.withLock {
-            outbound.acknowledge(hs.peerAckSeq).forEach { _events.emit(SessionEvent.Delivered(it)) }
-            for (m in outbound.replayAll(clock())) ch.send(WireCodec.encode(m))
-        }
-
         val result = try {
+            // Peer told us what it already has; replay the rest in order.
+            lock.withLock {
+                outbound.acknowledge(hs.peerAckSeq).forEach { _events.emit(SessionEvent.Delivered(it)) }
+                for (m in outbound.replayAll(clock())) ch.send(WireCodec.encode(m))
+            }
             serve(ch)
+        } catch (e: java.io.IOException) {
+            // Dropped while replaying; unacknowledged messages stay queued for the next link.
+            AttachResult.ChannelClosed
         } finally {
             if (channel === ch) channel = null
             ch.close()
