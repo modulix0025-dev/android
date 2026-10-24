@@ -84,7 +84,7 @@ jobs:
           key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
       - run: tools/fetch-native-deps.sh
       - name: Build
-        run: mkdir -p build && set -o pipefail && ./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --console=plain 2>&1 | tee build/ci-android.log
+        run: mkdir -p build && set -o pipefail && ./gradlew --continue :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --console=plain 2>&1 | tee build/ci-android.log
       - name: Error summary
         if: failure()
         run: |
@@ -148,7 +148,7 @@ jobs:
           key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
       - run: tools/fetch-native-deps.sh
       - name: Build app and test APKs (arm64 + x86_64)
-        run: mkdir -p build && set -o pipefail && ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain 2>&1 | tee build/ci-emulator.log
+        run: mkdir -p build && set -o pipefail && ./gradlew --continue :app:assembleDebug :app:assembleDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain 2>&1 | tee build/ci-emulator.log
       - name: Error summary
         if: failure()
         run: |
