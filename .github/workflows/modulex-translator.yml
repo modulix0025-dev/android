@@ -214,6 +214,45 @@ jobs:
           done
           exit 1
 
+  # Publishes the debug APK as a pre-release with a stable download URL, when the pushed commit
+  # message contains [release-apk] or the workflow is started by hand.
+  publish-apk:
+    name: Publish debug APK
+    needs: android
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release-apk]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: apks, path: apks }
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          apk=$(find apks -name app-debug.apk | head -1)
+          [ -n "$apk" ] || { echo "app-debug.apk missing"; exit 1; }
+          cp "$apk" ModuleX-Translator-debug.apk
+          sha256sum ModuleX-Translator-debug.apk | tee ModuleX-Translator-debug.apk.sha256
+          cat > notes.md <<EOF
+          Test build of ModuleX Translator from commit ${GITHUB_SHA::8} (CI run ${GITHUB_RUN_ID}).
+
+          - Debug build, signed with the CI debug key. For testing, not for store distribution.
+          - Android 10+ (API 29), 64-bit ARM phones. Offline translation needs ARMv8.2 dot-product support.
+          - Translation (1.1 GB) and speech (148 MB) models are downloaded inside the app (Language Packs),
+            verified by SHA-256. Arabic and English text recognition is bundled.
+          - Not yet validated on a physical device.
+          EOF
+          gh release delete modulex-translator-debug --yes --cleanup-tag || true
+          gh release create modulex-translator-debug ModuleX-Translator-debug.apk ModuleX-Translator-debug.apk.sha256 \
+            --prerelease --target "$GITHUB_SHA" --title "ModuleX Translator (debug test build)" --notes-file notes.md
+          echo "https://github.com/$GH_REPO/releases/download/modulex-translator-debug/ModuleX-Translator-debug.apk"
+
   model-eval:
     name: Real models (download, verify, pin, translate, transcribe)
     runs-on: ubuntu-24.04
