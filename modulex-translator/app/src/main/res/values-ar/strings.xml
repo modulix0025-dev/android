@@ -246,4 +246,9 @@
     <string name="notif_end">إنهاء</string>
 
     <string name="diag_title">التشخيص</string>
+    <string name="voice_tap_to_finish">اضغط للإنهاء: يُترجم ما قلته</string>
+    <string name="voice_recording_saved">تم حفظ التسجيل (%1$s)</string>
+    <string name="voice_play_recording">تشغيل التسجيل</string>
+    <string name="action_stop_generating">إيقاف التوليد</string>
+    <string name="voice_generation_stopped">تم الإيقاف</string>
 </resources>

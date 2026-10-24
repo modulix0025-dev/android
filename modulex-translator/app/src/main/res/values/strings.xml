@@ -261,4 +261,9 @@
 
     <!-- Diagnostics (debug builds) -->
     <string name="diag_title">Diagnostics</string>
+    <string name="voice_tap_to_finish">Tap to finish: what you said is translated</string>
+    <string name="voice_recording_saved">Recording saved (%1$s)</string>
+    <string name="voice_play_recording">Play recording</string>
+    <string name="action_stop_generating">Stop generating</string>
+    <string name="voice_generation_stopped">Stopped</string>
 </resources>

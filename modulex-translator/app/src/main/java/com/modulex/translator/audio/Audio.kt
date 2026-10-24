@@ -127,3 +127,32 @@ class PcmPlayer {
         track = null
     }
 }
+
+/**
+ * Session recordings of the voice screen: 16 kHz mono PCM16 WAV files in app-private storage
+ * (`files/recordings`), never uploaded. Only the newest [KEEP] are kept.
+ */
+object Recordings {
+    private const val KEEP = 20
+
+    fun save(filesDir: java.io.File, pcm: ShortArray): java.io.File {
+        val dir = java.io.File(filesDir, "recordings").apply { mkdirs() }
+        val f = java.io.File(dir, "voice-${System.currentTimeMillis()}.wav")
+        val data = java.nio.ByteBuffer.allocate(44 + pcm.size * 2).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+        data.put("RIFF".toByteArray()).putInt(36 + pcm.size * 2).put("WAVE".toByteArray())
+        data.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1).putInt(SAMPLE_RATE).putInt(SAMPLE_RATE * 2)
+            .putShort(2).putShort(16)
+        data.put("data".toByteArray()).putInt(pcm.size * 2)
+        pcm.forEach { data.putShort(it) }
+        f.writeBytes(data.array())
+        dir.listFiles { x -> x.name.endsWith(".wav") }.orEmpty().sortedByDescending { it.name }.drop(KEEP).forEach { it.delete() }
+        return f
+    }
+
+    /** PCM16 samples of a file written by [save]. */
+    fun read(f: java.io.File): ShortArray {
+        val b = java.nio.ByteBuffer.wrap(f.readBytes()).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+        b.position(44)
+        return ShortArray(b.remaining() / 2) { b.short }
+    }
+}

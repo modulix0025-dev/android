@@ -12,6 +12,11 @@ import kotlin.math.roundToInt
  *  2. automatic layout at half scale,
  *  3. projection-based line bands, each recognised in single-line mode at several normalised
  *     glyph heights (horizontal text only).
+ * Camera photos add uneven lighting (shadows, gradients, glare) and sometimes light text on a dark
+ * background; Tesseract binarises with one global threshold, so whole regions vanish. When the page
+ * is uneven or inverted, an illumination-flattened (and, if needed, inverted) copy is recognised as
+ * well and the line bands are taken from whichever version read better.
+ * Lines that are very low confidence or mostly symbols are dropped as noise.
  * Boxes are mapped back to the caller's coordinates. Invisible bidi marks are removed from text.
  */
 class OcrPipeline(
@@ -27,22 +32,28 @@ class OcrPipeline(
     suspend fun recognize(pixels: ByteArray, width: Int, height: Int, bytesPerPixel: Int, bytesPerLine: Int = width * bytesPerPixel,
                           layout: PageLayout = PageLayout.AUTO): Result {
         val start = System.nanoTime()
-        val gray = toGray(pixels, width, height, bytesPerPixel, bytesPerLine)
+        val original = toGray(pixels, width, height, bytesPerPixel, bytesPerLine)
+        val prepared = prepare(original, width, height)
+        // The flattened copy is only worth an extra pass when lighting is uneven or the text is light-on-dark.
+        val inputs = if (prepared != null) listOf(original, prepared) else listOf(original)
+        // Line bands come from a global ink threshold, which uneven light defeats: use the flattened copy when there is one.
+        val gray = prepared ?: original
         val base = minOf(1.0, maxDimension.toDouble() / max(width, height))
         var best: Pair<OcrResult, Double>? = null
         var bestScore = -1.0
         var passes = 0
         val diag = ArrayList<String>()
-        for (s in scales) {
+        for ((k, input) in inputs.withIndex()) for (s in scales) {
+            if (k > 0 && s != 1.0) continue // the flattened copy at full scale only
             val scale = base * s
             val w = (width * scale).roundToInt().coerceAtLeast(1)
             val h = (height * scale).roundToInt().coerceAtLeast(1)
             if (s != 1.0 && minOf(w, h) < minHeightForExtraScale) continue
-            val img = if (scale == 1.0) gray else resizeGray(gray, width, height, w, h)
-            val r = recognizer.recognize(img, w, h, 1, w, layout)
+            val img = if (scale == 1.0) input else resizeGray(input, width, height, w, h)
+            val r = denoise(recognizer.recognize(img, w, h, 1, w, layout))
             passes++
             val score = score(r)
-            diag += "layout@%.2f score=%.1f: %s".format(scale, score, r.text.replace("\n", " | "))
+            diag += "${if (k == 0) "layout" else "flattened"}@%.2f score=%.1f: %s".format(scale, score, r.text.replace("\n", " | "))
             if (score > bestScore) { bestScore = score; best = r to scale }
         }
         if (layout == PageLayout.AUTO) {
@@ -69,7 +80,7 @@ class OcrPipeline(
                         val cw = (w * f).roundToInt().coerceAtLeast(1)
                         val ch = (bh * f).roundToInt().coerceAtLeast(1)
                         val scaled = if (f == 1.0) crop else resizeGray(crop, w, bh, cw, ch)
-                        val r = recognizer.recognize(scaled, cw, ch, 1, cw, PageLayout.SINGLE_LINE)
+                        val r = denoise(recognizer.recognize(scaled, cw, ch, 1, cw, PageLayout.SINGLE_LINE))
                         elapsed += r.elapsedMs
                         val sc = score(r)
                         if (sc > bestLineScore) {
@@ -99,6 +110,81 @@ class OcrPipeline(
     }
 
     companion object {
+        /** Lines below this confidence (0-100) are noise (texture, edges), not text. */
+        const val MIN_LINE_CONFIDENCE = 20f
+
+        /** Drops lines that are low confidence or mostly symbols, and rebuilds the text and mean confidence. */
+        fun denoise(r: OcrResult): OcrResult {
+            val kept = r.lines.filter { l ->
+                val chars = l.text.filterNot { it.isWhitespace() }
+                l.conf >= MIN_LINE_CONFIDENCE && chars.isNotEmpty() && chars.count { it.isLetterOrDigit() } * 2 >= chars.length
+            }
+            if (kept.size == r.lines.size) return r
+            val conf = if (kept.isEmpty()) 0f else kept.map { it.conf }.average().toFloat()
+            return r.copy(text = kept.joinToString("\n") { it.text }, meanConfidence = conf, lines = kept)
+        }
+
+        /**
+         * Illumination-flattened copy of a photo, or null when the page is already even and dark-on-light.
+         * The background is the bright envelope of the page (per-cell 95th percentile, interpolated); each
+         * pixel is divided by it, which removes shadows and gradients. Light-on-dark pages are inverted first.
+         */
+        fun prepare(gray: ByteArray, w: Int, h: Int): ByteArray? {
+            if (w < 32 || h < 32) return null
+            val hist = IntArray(256)
+            for (b in gray) hist[b.toInt() and 0xff]++
+            var acc = 0; var median = 0
+            while (median < 255 && acc + hist[median] < gray.size / 2) { acc += hist[median]; median++ }
+            val inverted = median < 100 // mostly dark page: text is the light part
+            val src = if (inverted) ByteArray(gray.size) { (255 - (gray[it].toInt() and 0xff)).toByte() } else gray
+            val cell = maxOf(12, minOf(w, h) / 20)
+            val cx = (w + cell - 1) / cell; val cy = (h + cell - 1) / cell
+            val bg = FloatArray(cx * cy)
+            val ch = IntArray(256)
+            for (j in 0 until cy) for (i in 0 until cx) {
+                ch.fill(0); var n = 0
+                for (y in j * cell until minOf(h, (j + 1) * cell)) for (x in i * cell until minOf(w, (i + 1) * cell)) {
+                    ch[src[y * w + x].toInt() and 0xff]++; n++
+                }
+                var c = 0; var v = 255
+                while (v > 0 && c + ch[v] < n / 20) { c += ch[v]; v-- } // 95th percentile: the paper, not the ink
+                bg[j * cx + i] = maxOf(v, 24).toFloat()
+            }
+            // A cell much darker than the page (< half the median) lies inside a thick glyph, not in a shadow:
+            // its background is taken from neighbouring paper cells instead.
+            val paper = bg.sorted()[bg.size / 2]
+            val ink = BooleanArray(bg.size) { bg[it] < paper * 0.5f }
+            repeat(4) {
+                for (j in 0 until cy) for (i in 0 until cx) {
+                    if (!ink[j * cx + i]) continue
+                    var sum = 0f; var n = 0
+                    for (dj in -1..1) for (di in -1..1) {
+                        val jj = j + dj; val ii = i + di
+                        if (jj in 0 until cy && ii in 0 until cx && !ink[jj * cx + ii]) { sum += bg[jj * cx + ii]; n++ }
+                    }
+                    if (n > 0) { bg[j * cx + i] = sum / n; ink[j * cx + i] = false }
+                }
+            }
+            for (k in bg.indices) if (ink[k]) bg[k] = paper
+            // Judge evenness on the 20-80 % range of cells.
+            val sorted = bg.sorted()
+            val lo = sorted[sorted.size / 5]; val hi = sorted[sorted.size * 4 / 5]
+            if (!inverted && hi - lo < 40f) return null // even lighting: the original is fine
+            val out = ByteArray(gray.size)
+            for (y in 0 until h) {
+                val fy = ((y + 0.5f) / cell - 0.5f).coerceIn(0f, (cy - 1).toFloat())
+                val j0 = fy.toInt(); val j1 = minOf(cy - 1, j0 + 1); val ty = fy - j0
+                for (x in 0 until w) {
+                    val fx = ((x + 0.5f) / cell - 0.5f).coerceIn(0f, (cx - 1).toFloat())
+                    val i0 = fx.toInt(); val i1 = minOf(cx - 1, i0 + 1); val tx = fx - i0
+                    val b = (bg[j0 * cx + i0] * (1 - tx) + bg[j0 * cx + i1] * tx) * (1 - ty) +
+                        (bg[j1 * cx + i0] * (1 - tx) + bg[j1 * cx + i1] * tx) * ty
+                    out[y * w + x] = (255f * (src[y * w + x].toInt() and 0xff) / b).coerceIn(0f, 255f).toInt().toByte()
+                }
+            }
+            return out
+        }
+
         private val bidiMarks = Regex("[\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069]")
 
         fun stripBidiMarks(s: String) = s.replace(bidiMarks, "")

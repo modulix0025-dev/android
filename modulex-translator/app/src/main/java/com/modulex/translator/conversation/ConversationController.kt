@@ -433,7 +433,7 @@ class ConversationController(
                     }
                     VoiceEvent.NoSpeech -> _state.update { it.copy(mic = MicState.LISTENING, partial = null) }
                     is VoiceEvent.Failed -> _state.update { it.copy(notice = ev.reason) }
-                    is VoiceEvent.Level -> Unit
+                    is VoiceEvent.Level, is VoiceEvent.Recording -> Unit
                 }
             }
         }

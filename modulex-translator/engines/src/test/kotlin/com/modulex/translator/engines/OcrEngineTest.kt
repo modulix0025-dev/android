@@ -146,4 +146,66 @@ class OcrEngineTest {
         ocr.close()
         assertFailsWith<NativeEngineException> { ocr.recognize(ByteArray(4), 1, 1, 4) }
     }
+
+    /** Photo-like lighting: a dark shadow across one side and a gradient, as from a phone held over a page. */
+    private fun shade(rgba: ByteArray, w: Int, h: Int, invert: Boolean = false): ByteArray {
+        val out = rgba.copyOf()
+        for (y in 0 until h) for (x in 0 until w) {
+            val light = (0.3 + 0.7 * x / w) * (if (y > h * 0.6) 0.6 else 1.0) // left shadow, darker bottom band
+            val o = (y * w + x) * 4
+            for (k in 0..2) {
+                var v = rgba[o + k].toInt() and 0xff
+                if (invert) v = 255 - v
+                out[o + k] = (v * light).toInt().coerceIn(0, 255).toByte()
+            }
+        }
+        return out
+    }
+
+    @Test
+    fun readsUnevenlyLitAndInvertedPhotos() = runBlocking<Unit> {
+        val ocr = LocalTextRecognizer()
+        ocr.init(tessdata, "ara+eng").getOrThrow()
+        val expected = listOf("The quick brown fox jumps over the lazy dog.", "Platform 4 departs at 10:35 for Cairo.", "Pharmacy open until midnight")
+        val (px, w, h) = render(expected, listOf(false, false, false))
+        for (inverted in listOf(false, true)) {
+            val photo = shade(px, w, h, inverted)
+            val plain = ocr.recognize(photo, w, h, 4)
+            val p = OcrPipeline(ocr).recognize(photo, w, h, 4)
+            val before = cer(expected.joinToString("\n"), plain.text)
+            val after = cer(expected.joinToString("\n"), p.ocr.text)
+            println("OCR photo inverted=$inverted: cer plain=%.3f pipeline=%.3f text=%s".format(before, after, p.ocr.text.replace("\n", " | ")))
+            p.candidates.forEach { println("   $it") }
+            assertTrue(after < 0.1, "uneven/inverted photo CER too high: $after")
+            assertTrue(after <= before + 1e-9, "pipeline must not be worse than plain recognition")
+        }
+        ocr.close()
+    }
+
+    @Test
+    fun readsArabicInShadow() = runBlocking<Unit> {
+        val ocr = LocalTextRecognizer()
+        ocr.init(tessdata, "ara+eng").getOrThrow()
+        val expected = listOf("مخرج الطوارئ في نهاية الممر", "صيدلية مفتوحة طوال الليل")
+        val (px, w, h) = render(expected, listOf(true, true))
+        val photo = shade(px, w, h)
+        val before = cer(expected.joinToString("\n"), ocr.recognize(photo, w, h, 4).text)
+        val p = OcrPipeline(ocr).recognize(photo, w, h, 4)
+        val after = cer(expected.joinToString("\n"), p.ocr.text)
+        println("OCR arabic photo: cer plain=%.3f pipeline=%.3f".format(before, after))
+        p.candidates.forEach { println("   $it") }
+        // Measured 2026-10-24: plain 0.477 -> pipeline 0.273. The remaining errors come from the hard shadow
+        // edge crossing the second line, the worst case of this synthetic photo.
+        assertTrue(after < 0.3, "Arabic photo CER too high: $after")
+        assertTrue(after < before, "pipeline must improve the shaded Arabic photo")
+        ocr.close()
+    }
+
+    @Test
+    fun flatteningLeavesEvenPagesAlone() {
+        val even = ByteArray(300 * 200) { if (it % 300 in 100..140) 0 else 0xf0.toByte() }
+        assertTrue(OcrPipeline.prepare(even, 300, 200) == null, "an evenly lit page needs no extra pass")
+        val dark = ByteArray(300 * 200) { if (it % 300 in 100..140) 0xf0.toByte() else 20 }
+        assertTrue(OcrPipeline.prepare(dark, 300, 200) != null, "light text on a dark page is inverted")
+    }
 }

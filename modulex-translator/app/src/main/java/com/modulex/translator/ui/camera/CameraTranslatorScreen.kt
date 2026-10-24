@@ -289,7 +289,8 @@ private fun ResultCards(ph: CameraPhase.Result, st: CameraUiState, onRetry: () -
 private fun Viewfinder(flash: Boolean, onFlash: () -> Unit, onCaptured: (Bitmap) -> Unit, onGallery: () -> Unit) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
-    val capture = remember { ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build() }
+    // Quality over latency: sharp, low-noise frames are what the text recognizer needs.
+    val capture = remember { ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build() }
     var busy by remember { mutableStateOf(false) }
     capture.flashMode = if (flash) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
     val previewView = remember { PreviewView(context) }

@@ -19,7 +19,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilledIconButton
@@ -27,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +50,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.modulex.translator.R
 import com.modulex.translator.audio.ListenMode
+import com.modulex.translator.audio.PcmPlayer
+import com.modulex.translator.audio.Recordings
+import com.modulex.translator.audio.SAMPLE_RATE
 import com.modulex.translator.audio.VoiceEvent
 import com.modulex.translator.container
 import com.modulex.translator.core.language.Language
@@ -64,17 +70,22 @@ import com.modulex.translator.ui.components.LanguageText
 import com.modulex.translator.ui.components.PermissionGate
 import com.modulex.translator.ui.components.ScreenScaffold
 import com.modulex.translator.ui.components.messageRes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 data class VoiceTurn(
     val id: Long, val source: Language, val target: Language, val heard: String, val translated: String?,
     val error: TranslationError? = null,
     /** End of the spoken phrase -> translation shown, ms (measured, not estimated). */
     val latencyMs: Long? = null,
+    /** Generation was stopped by the user before a translation was produced. */
+    val cancelled: Boolean = false,
 )
 
 data class VoiceUiState(
@@ -87,6 +98,14 @@ data class VoiceUiState(
     val turns: List<VoiceTurn> = emptyList(),
     val autoSpeak: Boolean = true,
     val notice: Int? = null,
+    /** Microphone closed, the recorded phrases are still being recognised/translated (can be stopped). */
+    val finishing: Boolean = false,
+    /** Translation or recognition running (the stop-generation button is shown). */
+    val generating: Boolean = false,
+    /** Last saved session recording (app-private WAV), playable from the screen. */
+    val recording: File? = null,
+    val recordingMs: Long = 0,
+    val playing: Boolean = false,
 )
 
 class VoiceViewModel(app: Application) : AndroidViewModel(app) {
@@ -98,21 +117,26 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
     val state = _state.asStateFlow()
     val speechEngine = c.engines.speechState
     private var job: Job? = null
+    private val finish = MutableStateFlow(false)
+    private val player = PcmPlayer()
+    private var playJob: Job? = null
 
     fun setSource(l: Language?) = _state.update { it.copy(source = l) }
     fun setTarget(l: Language) = _state.update { it.copy(target = l) }
     fun swap() = _state.update { s -> s.source?.let { s.copy(source = s.target, target = it) } ?: s }
     fun setAutoSpeak(on: Boolean) = _state.update { it.copy(autoSpeak = on) }
 
-    fun toggle() { if (_state.value.listening) stop() else start() }
+    /** Mic button: start listening, or finish (keep what was said, process it, show the result). */
+    fun toggle() { if (_state.value.listening) finishRecording() else if (job?.isActive != true) start() }
 
     private fun start() {
         val s = _state.value
         val whisper = s.source?.whisperCode ?: "auto"
         c.speech.stop()
-        _state.update { it.copy(listening = true, notice = null) }
+        finish.value = false
+        _state.update { it.copy(listening = true, finishing = false, notice = null) }
         job = viewModelScope.launch {
-            c.voice.listen(whisper, ListenMode.AUTO).collect { ev ->
+            c.voice.listen(whisper, ListenMode.AUTO, finish = finish).collect { ev ->
                 when (ev) {
                     is VoiceEvent.Level -> _state.update { it.copy(level = ev.rms) }
                     VoiceEvent.SpeechStarted -> _state.update { it.copy(hearing = true) }
@@ -122,9 +146,53 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
                         it.copy(listening = false, notice = if (ev.reason == "speech_unavailable") R.string.voice_unavailable_body else R.string.err_generic)
                     }
                     is VoiceEvent.Final -> onFinal(ev)
+                    is VoiceEvent.Recording -> saveRecording(ev.pcm)
                 }
             }
-            _state.update { it.copy(listening = false, hearing = false) }
+            _state.update { it.copy(listening = false, hearing = false, finishing = false, generating = false) }
+        }
+    }
+
+    private fun finishRecording() {
+        finish.value = true
+        _state.update { it.copy(listening = false, hearing = false, finishing = true, generating = true, level = 0f) }
+    }
+
+    /** Stops recognition and translation now; text already shown stays. */
+    fun stopGenerating() {
+        c.engines.cancelTranslation()
+        c.engines.cancelSpeech()
+        job?.cancel()
+        _state.update { s ->
+            s.copy(listening = false, hearing = false, finishing = false, generating = false, partial = null,
+                turns = s.turns.map { if (it.translated == null && it.error == null) it.copy(cancelled = true) else it })
+        }
+    }
+
+    private suspend fun saveRecording(pcm: ShortArray) {
+        if (pcm.isEmpty() || !c.settings.settings.value.saveHistory) return
+        val file = withContext(Dispatchers.IO) { Recordings.save(getApplication<Application>().filesDir, pcm) }
+        _state.update { it.copy(recording = file, recordingMs = pcm.size * 1000L / SAMPLE_RATE) }
+    }
+
+    fun togglePlayback() {
+        if (_state.value.playing) { player.stop(); playJob?.cancel(); _state.update { it.copy(playing = false) }; return }
+        val f = _state.value.recording ?: return
+        c.speech.stop()
+        _state.update { it.copy(playing = true) }
+        playJob = viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val pcm = Recordings.read(f)
+                player.play { write ->
+                    var o = 0
+                    while (o < pcm.size) {
+                        val n = minOf(SAMPLE_RATE / 4, pcm.size - o)
+                        if (!write(FloatArray(n) { pcm[o + it] / 32768f }, SAMPLE_RATE)) break
+                        o += n
+                    }
+                }
+            }
+            _state.update { it.copy(playing = false) }
         }
     }
 
@@ -134,7 +202,7 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
         _state.update { it.copy(hearing = false, partial = null) }
         if (src == null) { _state.update { it.copy(notice = R.string.err_unsupported_language) }; return }
         val id = System.nanoTime()
-        _state.update { it.copy(turns = it.turns + VoiceTurn(id, src, s.target, ev.text, null)) }
+        _state.update { it.copy(turns = it.turns + VoiceTurn(id, src, s.target, ev.text, null), generating = true) }
         val r = c.engines.translate(ev.text, src, s.target) { p -> updateTurn(id) { t -> t.copy(translated = p) } }
         val latency = System.nanoTime() / 1_000_000 - ev.phraseEndAt
         when (r) {
@@ -145,8 +213,9 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
                 if (_state.value.autoSpeak && !c.speech.speak(r.text, s.target.code)) _state.update { it.copy(notice = R.string.err_speech_unavailable) }
             }
             is TranslationResult.Failure -> updateTurn(id) { it.copy(error = r.error, translated = null) }
-            TranslationResult.Cancelled -> Unit
+            TranslationResult.Cancelled -> updateTurn(id) { it.copy(cancelled = true) }
         }
+        if (!_state.value.finishing) _state.update { it.copy(generating = false) }
     }
 
     private fun updateTurn(id: Long, f: (VoiceTurn) -> VoiceTurn) =
@@ -159,10 +228,10 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
 
     fun stop() {
         job?.cancel()
-        _state.update { it.copy(listening = false, hearing = false, partial = null) }
+        _state.update { it.copy(listening = false, hearing = false, partial = null, finishing = false, generating = false) }
     }
 
-    override fun onCleared() { stop(); c.speech.stop() }
+    override fun onCleared() { stop(); player.stop(); c.speech.stop() }
 }
 
 @Composable
@@ -199,6 +268,8 @@ fun VoiceTranslatorScreen(onBack: () -> Unit, onManagePacks: () -> Unit, vm: Voi
                                 Spacer(Modifier.padding(4.dp))
                                 when {
                                     t.error != null -> Text(stringResource(t.error.messageRes()), color = MaterialTheme.colorScheme.error)
+                                    t.cancelled && t.translated == null -> Text(stringResource(R.string.voice_generation_stopped),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     t.translated != null -> LanguageText(t.translated, t.target, style = MaterialTheme.typography.titleMedium)
                                     else -> Text(stringResource(R.string.translating), color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
@@ -214,7 +285,25 @@ fun VoiceTranslatorScreen(onBack: () -> Unit, onManagePacks: () -> Unit, vm: Voi
                     }
                     st.partial?.let { p -> item { LanguageText("… $p", st.source, style = MaterialTheme.typography.bodyMedium) } }
                 }
-                MicButton(listening = st.listening, hearing = st.hearing, level = st.level, onClick = vm::toggle)
+                st.recording?.let {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.voice_recording_saved, "%d:%02d".format(st.recordingMs / 60_000, st.recordingMs / 1000 % 60)),
+                            Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                        IconButton(onClick = vm::togglePlayback) {
+                            Icon(if (st.playing) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+                                stringResource(if (st.playing) R.string.action_stop else R.string.voice_play_recording))
+                        }
+                    }
+                }
+                if (st.generating || st.finishing) {
+                    OutlinedButton(onClick = vm::stopGenerating, Modifier.fillMaxWidth()) {
+                        Icon(Icons.Filled.Close, null)
+                        Spacer(Modifier.padding(4.dp))
+                        Text(stringResource(R.string.action_stop_generating))
+                    }
+                }
+                MicButton(listening = st.listening, hearing = st.hearing, level = st.level, onClick = vm::toggle,
+                    finishing = st.finishing)
             }
         }
     }
@@ -230,7 +319,7 @@ fun VoiceTranslatorScreen(onBack: () -> Unit, onManagePacks: () -> Unit, vm: Voi
 }
 
 @Composable
-fun MicButton(listening: Boolean, hearing: Boolean, level: Float, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun MicButton(listening: Boolean, hearing: Boolean, level: Float, onClick: () -> Unit, modifier: Modifier = Modifier, finishing: Boolean = false) {
     val scale by animateFloatAsState(if (hearing) 1f + (level * 6f).coerceAtMost(0.25f) else 1f, label = "mic")
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(contentAlignment = Alignment.Center) {
@@ -238,6 +327,7 @@ fun MicButton(listening: Boolean, hearing: Boolean, level: Float, onClick: () ->
             val fg = if (listening) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary
             FilledIconButton(
                 onClick = onClick,
+                enabled = !finishing,
                 modifier = Modifier.size(84.dp).scale(scale)
                     .then(if (listening) Modifier.border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape) else Modifier),
                 shape = CircleShape,
@@ -251,7 +341,12 @@ fun MicButton(listening: Boolean, hearing: Boolean, level: Float, onClick: () ->
             }
         }
         Text(
-            stringResource(when { hearing -> R.string.voice_listening; listening -> R.string.voice_recording_indicator; else -> R.string.voice_tap_to_speak }),
+            stringResource(when {
+                finishing -> R.string.voice_processing
+                hearing -> R.string.voice_listening
+                listening -> R.string.voice_tap_to_finish
+                else -> R.string.voice_tap_to_speak
+            }),
             style = MaterialTheme.typography.labelLarge,
         )
     }

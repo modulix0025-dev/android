@@ -159,6 +159,13 @@ class TextTranslatorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Stops the running translation; the text produced so far stays on screen. */
+    fun stopGenerating() {
+        job?.cancel()
+        c.engines.cancelTranslation()
+        _state.update { it.copy(status = TextStatus.Idle) }
+    }
+
     fun speak() {
         val s = _state.value
         if (s.output.isBlank()) return
@@ -209,8 +216,12 @@ fun TextTranslatorScreen(initialText: String?, onBack: () -> Unit, onManagePacks
                     clip?.getItemAt(0)?.coerceToText(context)?.toString()?.let(vm::setInput)
                 }) { Icon(Icons.Filled.ContentPaste, null); Spacer(Modifier.padding(4.dp)); Text(stringResource(R.string.action_paste)) }
                 Spacer(Modifier.weight(1f))
-                Button(onClick = vm::translate, enabled = st.input.isNotBlank() && st.status != TextStatus.Translating) {
-                    Text(stringResource(R.string.action_translate))
+                if (st.status == TextStatus.Translating) {
+                    OutlinedButton(onClick = vm::stopGenerating) { Text(stringResource(R.string.action_stop_generating)) }
+                } else {
+                    Button(onClick = vm::translate, enabled = st.input.isNotBlank()) {
+                        Text(stringResource(R.string.action_translate))
+                    }
                 }
             }
 
