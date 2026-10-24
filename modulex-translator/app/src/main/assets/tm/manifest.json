@@ -38,9 +38,9 @@
     "kaikki": 97
    },
    "withStandard": 1,
-   "withTerms": 93,
-   "bytes": 35137,
-   "sha256": "6b5ee5342331a5b648c4f34ce7f0df4a40147351629b9e8a32368fd0dc504b08",
+   "withTerms": 73,
+   "bytes": 34489,
+   "sha256": "0821022772dfcb94cf562cc7e29595ba435be52da05a9aad57688780c7bfa3b4",
    "rejected": {
     "length": 181,
     "schema": 46,
@@ -75,9 +75,9 @@
     "kaikki": 68
    },
    "withStandard": 5,
-   "withTerms": 382,
-   "bytes": 108996,
-   "sha256": "c79b45d3465b45cf50732fe8dd6d4242c02a4329321b7c14fd1b952c7c2bbc1b",
+   "withTerms": 240,
+   "bytes": 103927,
+   "sha256": "a6b0a56748f2747cb0c485e418182df53bfcf0fdfa05beac55cd8893055cf371",
    "rejected": {
     "length": 1090,
     "schema": 258
@@ -108,9 +108,9 @@
     "kaikki": 171
    },
    "withStandard": 2,
-   "withTerms": 156,
-   "bytes": 59938,
-   "sha256": "8e4597ecb0b2609eef452d884778040507010bc6b7e6f1d4ab93a3f01cfe7e75",
+   "withTerms": 121,
+   "bytes": 58694,
+   "sha256": "ede306ea8ce392a61c34759387c980e353b3e3a05955436957baf07d33ebb01b",
    "rejected": {
     "length": 221,
     "schema": 26,
@@ -127,9 +127,9 @@
     "kaikki": 164
    },
    "withStandard": 0,
-   "withTerms": 171,
-   "bytes": 50470,
-   "sha256": "12fe0f73bd5af553707686b58b87dac26db16d9d2a3ba1554aa7936dd01de505",
+   "withTerms": 149,
+   "bytes": 48676,
+   "sha256": "2f42a7529f8b23871432205fe694684243d9e60356bf3d6f5fba5893137682b0",
    "rejected": {
     "script": 2,
     "length": 234,
@@ -145,9 +145,9 @@
     "kaikki": 212
    },
    "withStandard": 2,
-   "withTerms": 259,
-   "bytes": 78183,
-   "sha256": "1758f78d4e9495b48034cea7d8a192081573952245b45bed76fd4027452d6fe4",
+   "withTerms": 199,
+   "bytes": 73396,
+   "sha256": "a73311e5ea2fffd354156aa906a86ff324b1fadcbf7637cc36aba0af895bd84d",
    "rejected": {
     "schema": 14,
     "length": 699,
@@ -163,9 +163,9 @@
     "kaikki": 31
    },
    "withStandard": 0,
-   "withTerms": 30,
-   "bytes": 8246,
-   "sha256": "f778ec466dcc6f24403c02cda3225ed2a7c23eeae5ac7ae140e01db40b11c766",
+   "withTerms": 19,
+   "bytes": 7827,
+   "sha256": "507e4c76a5b6a3bf085eb75a5d1f0f5e85db83958c7381aa9884c5810c8548fa",
    "rejected": {
     "length": 132
    }
@@ -178,9 +178,9 @@
     "kaikki": 53
    },
    "withStandard": 0,
-   "withTerms": 52,
-   "bytes": 16289,
-   "sha256": "118e0e6c757cd40e61e744e7167ad9c8adafa3a20b63884b91ba823b437d84a1",
+   "withTerms": 39,
+   "bytes": 15876,
+   "sha256": "95b8ef54465cd1d99d072036c6f4c70f6a1ea6a4c161f6658c996effa534999f",
    "rejected": {
     "length": 193
    }
