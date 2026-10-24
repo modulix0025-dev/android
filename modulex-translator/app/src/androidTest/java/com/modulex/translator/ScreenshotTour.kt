@@ -96,7 +96,7 @@ class ScreenshotTour {
             context.container.settings.update { it.copy(theme = theme) }
             val p = "${lang}-${theme.name.lowercase()}"
             var n = 0
-            fun name(s: String) = "%02d-%s".format(++n, s)
+            fun name(s: String) = "%02d-%s".format(java.util.Locale.ROOT, ++n, s) // ASCII digits in file names whatever the app locale
 
             shot(p, name("home")) {}
             shot(p, name("home-scrolled")) { scrollDown() }
