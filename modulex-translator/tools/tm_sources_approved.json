@@ -1,0 +1,40 @@
+{
+ "_comment": "Sources whose licence text was read (CI job tm-sources, log of each run) and allows redistribution inside a commercial app. Only these are built into app/src/main/assets/tm. Excluded and unresolved sources are listed with the reason; see docs/LICENSING.md.",
+ "sources": {
+  "tatoeba": {
+   "approved": true,
+   "license": "CC-BY-2.0-FR",
+   "attribution": "Tatoeba (https://tatoeba.org) contributors; each pair names its sentence ids and authors",
+   "evidence": "tatoeba.org/en/downloads: 'These files are released under CC BY 2.0 FR'; terms of use 6.2: CC-BY 2.0 FR default for text sentences, single condition attribution",
+   "domain": "daily"
+  },
+  "kaikki": {
+   "approved": true,
+   "license": "CC-BY-SA-4.0",
+   "attribution": "Wiktionary contributors (https://en.wiktionary.org), extracted with wiktextract / kaikki.org (Tatu Ylonen)",
+   "evidence": "Wiktionary text is CC BY-SA 4.0 (and GFDL); kaikki.org redistributes the extracted entries",
+   "share_alike": "the shipped tm/*.tsv files that contain Wiktionary rows are themselves CC BY-SA 4.0",
+   "domain": "dictionary-example"
+  },
+  "flores": {
+   "approved": false,
+   "license": "CC-BY-SA-4.0 (dataset card)",
+   "reason": "gated on Hugging Face: needs an HF_TOKEN secret and acceptance of the gate terms, which must be read first"
+  },
+  "doda": {
+   "approved": false,
+   "license": "CC-BY-NC-4.0",
+   "reason": "LICENSE file: Creative Commons Attribution-NonCommercial 4.0; README: commercial use only with the authors' permission"
+  },
+  "arzen-multigenre": {
+   "approved": false,
+   "license": "CC-BY-4.0 (Mendeley Data page)",
+   "reason": "segments come from published song lyrics, novels and film subtitles whose copyright is not the dataset authors'; owner decision pending"
+  },
+  "padic": {"approved": false, "reason": "licence page not reachable from CI (smart.loria.fr timed out, sourceforge 403)"},
+  "lisan": {"approved": false, "reason": "licence page not reachable from CI; word-level glosses only, no sentence translations"},
+  "madar": {"approved": false, "license": "research / non-commercial", "reason": "not allowed in a commercial app"},
+  "ufal-north-levantine": {"approved": false, "license": "CC-BY-NC-SA-4.0", "reason": "non-commercial"},
+  "nadi": {"approved": false, "license": "research only", "reason": "not allowed in a commercial app"}
+ }
+}

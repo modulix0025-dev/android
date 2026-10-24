@@ -421,6 +421,43 @@ jobs:
           name: tm-raw
           path: ${{ runner.temp }}/tm-raw
 
+  # Builds the verified dialect corpora (app/src/main/assets/tm, held-out split in engines test
+  # resources) from the approved sources only, prints a 200-pair sample per dialect for review and
+  # commits the result to this branch, when the commit message contains [tm-build].
+  tm-build:
+    name: Dialect corpora (build, verify, commit)
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[tm-build]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write # only used to commit the built corpora back to this branch
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Tools
+        run: python3 -m pip install --user --break-system-packages "huggingface_hub>=0.25" pyarrow
+      - name: Fetch the approved sources
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          only=$(python3 -c "import json;print(','.join(k for k,v in json.load(open('tools/tm_sources_approved.json'))['sources'].items() if v.get('approved')))")
+          python3 tools/tm_sources.py --out "$RUNNER_TEMP/tm-raw" --only "$only"
+      - name: Build and verify
+        run: |
+          set -o pipefail
+          python3 tools/tm_build.py --raw "$RUNNER_TEMP/tm-raw" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Commit the corpora to the branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/assets/tm engines/src/test/resources/tm-heldout
+          git commit -qm "Dialect corpora built by CI run ${{ github.run_id }} from the approved sources" || exit 0
+          for i in 1 2 3; do
+            git fetch -q origin "${{ github.ref_name }}" && git rebase -q FETCH_HEAD && git push -q origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep 5
+          done
+          exit 1
+
   signaling-image:
     name: Signaling relay Docker image
     runs-on: ubuntu-24.04
