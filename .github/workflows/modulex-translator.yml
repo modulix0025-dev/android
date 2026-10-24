@@ -400,6 +400,27 @@ jobs:
           name: tm-inventory
           path: ${{ runner.temp }}/tm_inventory.json
 
+  tm-sources:
+    name: Dialect corpus sources (licence evidence and raw pairs)
+    if: contains(github.event.head_commit.message, '[tm-sources]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: python3 -m pip install --user --break-system-packages "huggingface_hub>=0.25" pyarrow
+      - name: Fetch every candidate source, print its licence, extract pairs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -o pipefail
+          python3 tools/tm_sources.py --out "$RUNNER_TEMP/tm-raw" | tee -a "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tm-raw
+          path: ${{ runner.temp }}/tm-raw
+
   signaling-image:
     name: Signaling relay Docker image
     runs-on: ubuntu-24.04
