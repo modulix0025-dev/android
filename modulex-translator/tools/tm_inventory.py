@@ -28,9 +28,9 @@ import urllib.request
 
 TATOEBA = "https://downloads.tatoeba.org/exports/per_language"
 WIKT = "https://en.wiktionary.org/w/api.php"
-# Candidate lists longer than this are not scanned for near duplicates. Dialect sets are far below
-# it, so their check is exact; for million-sentence standard languages the near-dup count is a lower bound.
-MAX_POSTING = 2000
+# The near-duplicate check is pairwise over shared trigrams; it runs on sets up to this size (every
+# dialect fits). Million-sentence standard languages get exact-duplicate removal only ("near_dup": null).
+NEAR_DUP_LIMIT = 200_000
 UA = "ModuleX-Translator-corpus-inventory/1 (CI; github.com/modulix0025-dev/android)"
 
 # app language -> (Tatoeba code of the standard language, [(dialect tag, Tatoeba code, name)]).
@@ -139,7 +139,8 @@ def tatoeba(code, std, arabic, cache):
     total = len(rows)
     to_eng = linked_ids(code, "eng", cache) if code != "eng" else set()
     to_std = linked_ids(code, std, cache) if code != std else set()
-    seen, kept, short, exact, near = set(), [], 0, 0, 0
+    check_near = total <= NEAR_DUP_LIMIT
+    seen, kept, short, exact, near = set(), [], 0, 0, 0 if check_near else None
     index = {}  # trigram -> kept ids (posting lists); near-duplicate check against candidates only
     for r in rows:
         if len(r) < 3:
@@ -153,19 +154,20 @@ def tatoeba(code, std, arabic, cache):
         if norm in seen:
             exact += 1
             continue
-        grams = trigrams(words)
-        cand = set()
-        for g in grams:
-            post = index.get(g, ())
-            if len(post) <= MAX_POSTING:  # very common trigrams (huge standard-language sets) are skipped
-                cand.update(post)
-        if any(len(grams & kept[i][1]) / len(grams | kept[i][1]) >= 0.8 for i in cand):
-            near += 1
-            continue
         seen.add(norm)
-        for g in grams:
-            index.setdefault(g, []).append(len(kept))
-        kept.append((sid, grams))
+        if check_near:
+            grams = trigrams(words)
+            cand = set()
+            for g in grams:
+                cand.update(index.get(g, ()))
+            if any(len(grams & kept[i][1]) / len(grams | kept[i][1]) >= 0.8 for i in cand):
+                near += 1
+                continue
+            for g in grams:
+                index.setdefault(g, []).append(len(kept))
+            kept.append((sid, grams))
+        else:
+            kept.append((sid, None))
     ids = {k[0] for k in kept}
     return {
         "sentences": total, "too_short": short, "exact_dup": exact, "near_dup": near, "eligible": len(kept),
@@ -184,42 +186,53 @@ def wikt_counts(cats, cache):
     return out
 
 
+HEADER = ("| Dialect | Name | Tatoeba code | Sentences | >=5 words, unique | near-dup removed | with EN | with standard "
+          "| with both | Wiktionary |\n|---|---|---|---:|---:|---:|---:|---:|---:|---|")
+
+
+def table_row(r):
+    c = r.get("counts")
+    if "error" in r:
+        nums = ["error"] * 6
+    elif c:
+        nums = [c["sentences"], c["eligible"], "not checked" if c["near_dup"] is None else c["near_dup"],
+                c["with_en"], c["with_std"], c["with_both"]]
+    else:
+        nums = ["-"] * 6
+    w = "; ".join(f"{k}: {'missing' if v is None else v}" for k, v in r.get("wiktionary", {}).items()) or "-"
+    return f"| {r['dialect']} | {r['name']} | {r['tatoeba'] or 'not tagged'} | " + " | ".join(map(str, nums)) + f" | {w} |"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--cache", default=os.path.join(os.environ.get("RUNNER_TEMP", "/tmp"), "tm-cache"))
     a = ap.parse_args()
     os.makedirs(a.cache, exist_ok=True)
+    # Dialects first (small, the point of this inventory), then the large standard languages.
+    jobs = [(lang, std, d) for lang, (std, ds) in DIALECTS.items() for d in ds]
+    jobs += [(lang, std, (lang, std, "standard")) for lang, (std, _) in DIALECTS.items()]
     result, failures = [], []
-    for lang, (std, dialects) in DIALECTS.items():
-        arabic = lang == "ar"
-        for tag, code, name in [(lang, std, "standard")] + dialects:
-            row = {"lang": lang, "dialect": tag, "name": name, "tatoeba": code}
-            if code:
-                try:
-                    row["counts"] = tatoeba(code, std, arabic, a.cache)
-                except Exception as e:  # report and continue: one host hiccup must not hide the rest
-                    failures.append(f"{tag}: {e}")
-                    row["error"] = str(e)
-            if tag in WIKT_CATS:
-                try:
-                    row["wiktionary"] = wikt_counts(WIKT_CATS[tag], a.cache)
-                except Exception as e:
-                    failures.append(f"{tag} wiktionary: {e}")
-            result.append(row)
-            print(f"done {tag}", file=sys.stderr, flush=True)
-    json.dump({"generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "rows": result}, open(a.out, "w"),
-              ensure_ascii=False, indent=1)
-
-    print("| Dialect | Name | Tatoeba code | Sentences | >=5 words, unique | with EN | with standard | with both | Wiktionary |")
-    print("|---|---|---|---:|---:|---:|---:|---:|---|")
-    for r in result:
-        c = r.get("counts")
-        nums = [c["sentences"], c["eligible"], c["with_en"], c["with_std"], c["with_both"]] if c else ["-"] * 5
-        if "error" in r:
-            nums = ["error"] * 5
-        w = "; ".join(f"{k}: {'missing' if v is None else v}" for k, v in r.get("wiktionary", {}).items()) or "-"
-        print(f"| {r['dialect']} | {r['name']} | {r['tatoeba'] or 'not tagged'} | " + " | ".join(map(str, nums)) + f" | {w} |")
+    print(HEADER, flush=True)
+    for lang, std, (tag, code, name) in jobs:
+        started = time.time()
+        row = {"lang": lang, "dialect": tag, "name": name, "tatoeba": code}
+        if code:
+            try:
+                row["counts"] = tatoeba(code, std, lang == "ar", a.cache)
+            except Exception as e:  # report and continue: one host hiccup must not hide the rest
+                failures.append(f"{tag}: {e}")
+                row["error"] = str(e)
+        if tag in WIKT_CATS:
+            try:
+                row["wiktionary"] = wikt_counts(WIKT_CATS[tag], a.cache)
+            except Exception as e:
+                failures.append(f"{tag} wiktionary: {e}")
+        result.append(row)
+        print(table_row(row), flush=True)
+        print(f"done {tag} in {time.time() - started:.0f} s", file=sys.stderr, flush=True)
+        json.dump({"generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "rows": result},
+                  open(a.out, "w"), ensure_ascii=False, indent=1)
     if failures:
         print("\nFailures:\n" + "\n".join(failures))
         sys.exit(1)
