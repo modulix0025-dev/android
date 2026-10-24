@@ -86,7 +86,7 @@ Conclusion: the failures reported by users (terms copied or transliterated: «ج
 artefact of quantisation, sampling or prompt language. Terminology hints in the authors' documented
 format fix them; the app now sends hints from a curated glossary (assets/glossary). Q4_K_M stays.
 
-### Dialect corpora (`assets/tm`, built by CI job `tm-build`, run 40090911200)
+### Dialect corpora (`assets/tm`, built by CI job `tm-build`, run 40095171376; held-out split by English sentence)
 
 Verified pairs per dialect after the corpus rules (>= 5 words, script, no exact or 3-gram-Jaccard
 >= 0.8 near duplicates, MSA-looking rows rejected); 10% held out for evaluation and never shipped.
@@ -95,21 +95,21 @@ has 2,792 single-meaning terms.
 
 | Dialect | Shipped pairs | Held out | By source | With MSA side | Bytes |
 |---|---:|---:|---|---:|---:|
-| ar-AE | 94 | 12 | tatoeba 14, kaikki 80 | 1 | 25,564 |
-| ar-DZ | 623 | 67 | tatoeba 623 | 8 | 140,995 |
-| ar-EG | 9826 | 1055 | oldi_seed 5498, smol 3938, tatoeba 350, kaikki 40 | 5 | 3,964,057 |
-| ar-IQ | 3 | 1 | tatoeba 3 | 2 | 864 |
-| ar-LB | 138 | 12 | tatoeba 12, kaikki 126 | 2 | 37,442 |
-| ar-LY | 2029 | 221 | smol 2029 | 0 | 634,324 |
-| ar-MA | 5706 | 630 | oldi_seed 5538, tatoeba 10, kaikki 158 | 0 | 2,636,885 |
-| ar-PS | 245 | 43 | tatoeba 46, kaikki 199 | 2 | 66,785 |
-| ar-SA | 28 | 1 | kaikki 28 | 0 | 7,096 |
-| ar-SD | 2012 | 212 | smol 2012 | 0 | 635,563 |
-| ar-TN | 2119 | 247 | smol 2068, kaikki 51 | 0 | 682,744 |
-| **total** | **22823** | **2501** | | | **8,832,319** |
+| ar-AE | 92 | 14 | tatoeba 14, kaikki 78 | 1 | 25,000 |
+| ar-DZ | 616 | 74 | tatoeba 616 | 8 | 139,674 |
+| ar-EG | 9830 | 1051 | oldi_seed 5475, smol 3974, tatoeba 340, kaikki 41 | 4 | 3,971,814 |
+| ar-IQ | 4 | 0 | tatoeba 4 | 3 | 1,196 |
+| ar-LB | 134 | 16 | tatoeba 11, kaikki 123 | 2 | 36,266 |
+| ar-LY | 1988 | 262 | smol 1988 | 0 | 622,391 |
+| ar-MA | 5698 | 638 | oldi_seed 5532, tatoeba 9, kaikki 157 | 0 | 2,639,192 |
+| ar-PS | 259 | 29 | tatoeba 43, kaikki 216 | 1 | 70,869 |
+| ar-SA | 28 | 1 | kaikki 28 | 0 | 7,099 |
+| ar-SD | 1962 | 262 | smol 1962 | 0 | 622,666 |
+| ar-TN | 2094 | 272 | smol 2042, kaikki 52 | 0 | 675,545 |
+| **total** | **22705** | **2619** | | | **8,811,712** |
 
-Not reached: 10,000 shipped pairs per dialect. Egyptian has 10,881 verified pairs in total (9,826 shipped
-+ 1,055 held out); every other dialect is below that because no more openly licensed, human-made data was
+Not reached: 10,000 shipped pairs per dialect. Egyptian has 10,881 verified pairs in total (9,830 shipped
++ 1,051 held out); every other dialect is below that because no more openly licensed, human-made data was
 found (see the excluded sources in `docs/LICENSING.md`). No pairs were generated to fill the gap.
 English, Spanish, Portuguese and French regional varieties have no openly licensed sentence pairs in
 these sources (Tatoeba does not tag them; Wiktionary has terms only).
