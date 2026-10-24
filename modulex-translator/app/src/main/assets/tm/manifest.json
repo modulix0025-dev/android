@@ -46,16 +46,16 @@
  "corpora": {
   "ar-AE": {
    "file": "ar-AE.tsv",
-   "pairs": 94,
-   "heldout": 12,
+   "pairs": 92,
+   "heldout": 14,
    "bySource": {
     "tatoeba": 14,
-    "kaikki": 80
+    "kaikki": 78
    },
    "withStandard": 1,
-   "withTerms": 58,
-   "bytes": 25564,
-   "sha256": "a4c197797b5ba8b3f636c4dfa3da9effa906eb80bc02f4ae2fa279cc999ebdc0",
+   "withTerms": 56,
+   "bytes": 25000,
+   "sha256": "1e0237ef0dfd919a817c791a5bd2e2854ca23a4aa811db8ed764e1e4dc059e56",
    "rejected": {
     "length": 181,
     "looks-msa": 6,
@@ -66,15 +66,15 @@
   },
   "ar-DZ": {
    "file": "ar-DZ.tsv",
-   "pairs": 623,
-   "heldout": 67,
+   "pairs": 616,
+   "heldout": 74,
    "bySource": {
-    "tatoeba": 623
+    "tatoeba": 616
    },
    "withStandard": 8,
    "withTerms": 0,
-   "bytes": 140995,
-   "sha256": "17f88d07af125ebade871842fa4e2eb11defd450b6fdf3233563d47535fa2e89",
+   "bytes": 139674,
+   "sha256": "93a22e8cfb3bfe4feb195ad50ea096f6e400d134038d3b34c866c6411daaf20c",
    "rejected": {
     "length": 1052,
     "schema": 700,
@@ -85,18 +85,18 @@
   },
   "ar-EG": {
    "file": "ar-EG.tsv",
-   "pairs": 9826,
-   "heldout": 1055,
+   "pairs": 9830,
+   "heldout": 1051,
    "bySource": {
-    "oldi_seed": 5498,
-    "smol": 3938,
-    "tatoeba": 350,
-    "kaikki": 40
+    "oldi_seed": 5475,
+    "smol": 3974,
+    "tatoeba": 340,
+    "kaikki": 41
    },
-   "withStandard": 5,
-   "withTerms": 4733,
-   "bytes": 3964057,
-   "sha256": "33cd490c6f0b1fdca6ed0a780c35de382f62cdc75beff3304de79a82dc7b668f",
+   "withStandard": 4,
+   "withTerms": 4766,
+   "bytes": 3971814,
+   "sha256": "ec877bb37e91e461cd58317706cc991356dba32d40525fe28ff40ca0226541bb",
    "rejected": {
     "looks-msa": 288,
     "length": 1464,
@@ -107,15 +107,15 @@
   },
   "ar-IQ": {
    "file": "ar-IQ.tsv",
-   "pairs": 3,
-   "heldout": 1,
+   "pairs": 4,
+   "heldout": 0,
    "bySource": {
-    "tatoeba": 3
+    "tatoeba": 4
    },
-   "withStandard": 2,
+   "withStandard": 3,
    "withTerms": 0,
-   "bytes": 864,
-   "sha256": "6f98a371361039d46c8bb6c32f9be62c338612856569257521d89b7c91eff6a4",
+   "bytes": 1196,
+   "sha256": "8fad9dc733f89dbf2df480c9d929b522acd92bfba7a4fc54982c2854989bb95e",
    "rejected": {
     "schema": 42,
     "length": 11,
@@ -124,16 +124,16 @@
   },
   "ar-LB": {
    "file": "ar-LB.tsv",
-   "pairs": 138,
-   "heldout": 12,
+   "pairs": 134,
+   "heldout": 16,
    "bySource": {
-    "tatoeba": 12,
-    "kaikki": 126
+    "tatoeba": 11,
+    "kaikki": 123
    },
    "withStandard": 2,
-   "withTerms": 87,
-   "bytes": 37442,
-   "sha256": "8f5c1aecfe72c0b71d651362b53e84985de1ce6c3cbad05f8bd9fff424699615",
+   "withTerms": 81,
+   "bytes": 36266,
+   "sha256": "8e463591419452c23a42b4c12a1b0fcf081bf44113189880967b39e17e7b7a55",
    "rejected": {
     "length": 211,
     "schema": 26,
@@ -144,15 +144,15 @@
   },
   "ar-LY": {
    "file": "ar-LY.tsv",
-   "pairs": 2029,
-   "heldout": 221,
+   "pairs": 1988,
+   "heldout": 262,
    "bySource": {
-    "smol": 2029
+    "smol": 1988
    },
    "withStandard": 0,
    "withTerms": 0,
-   "bytes": 634324,
-   "sha256": "ee46c3d7ae6a623286aef89b6b21a718e05c6e250079cb3575832aeb99a9d02d",
+   "bytes": 622391,
+   "sha256": "7e120718369c1e4d1adeefa79737a320b2f8c01168898629d16b368d616a1479",
    "rejected": {
     "script": 2423,
     "length": 195,
@@ -163,17 +163,17 @@
   },
   "ar-MA": {
    "file": "ar-MA.tsv",
-   "pairs": 5706,
-   "heldout": 630,
+   "pairs": 5698,
+   "heldout": 638,
    "bySource": {
-    "oldi_seed": 5538,
-    "tatoeba": 10,
-    "kaikki": 158
+    "oldi_seed": 5532,
+    "tatoeba": 9,
+    "kaikki": 157
    },
    "withStandard": 0,
-   "withTerms": 3619,
-   "bytes": 2636885,
-   "sha256": "5befc6777e6a3eeb2f472408d492f0b1bf9eac54e81cb55b954ed3af6a173ebb",
+   "withTerms": 3609,
+   "bytes": 2639192,
+   "sha256": "41226262b5c56c35cb7b57cb90376f9beb72aaf6d141cd8bf9292a184a1a3c61",
    "rejected": {
     "looks-msa": 18,
     "length": 250,
@@ -184,16 +184,16 @@
   },
   "ar-PS": {
    "file": "ar-PS.tsv",
-   "pairs": 245,
-   "heldout": 43,
+   "pairs": 259,
+   "heldout": 29,
    "bySource": {
-    "tatoeba": 46,
-    "kaikki": 199
+    "tatoeba": 43,
+    "kaikki": 216
    },
-   "withStandard": 2,
-   "withTerms": 193,
-   "bytes": 66785,
-   "sha256": "be1e22e9a3cf9faf8691b6190636d9362aaa8f8de64d39a85ed57f8a7563d069",
+   "withStandard": 1,
+   "withTerms": 208,
+   "bytes": 70869,
+   "sha256": "4977d45d06dc2d7daccc2ccda315df5a17d6e75d57ca2f4466498f9a199cc1ea",
    "rejected": {
     "schema": 14,
     "length": 699,
@@ -209,9 +209,9 @@
     "kaikki": 28
    },
    "withStandard": 0,
-   "withTerms": 19,
-   "bytes": 7096,
-   "sha256": "0d3415ff9dac09f60f18ed7ed879dc7fe387ed1e1adedbbd644606e63cf7f607",
+   "withTerms": 20,
+   "bytes": 7099,
+   "sha256": "039d9b10e007df15c7a167682afc3e29e68fe9ff97e4c4266213db6dcba75755",
    "rejected": {
     "length": 132,
     "looks-msa": 3
@@ -219,15 +219,15 @@
   },
   "ar-SD": {
    "file": "ar-SD.tsv",
-   "pairs": 2012,
-   "heldout": 212,
+   "pairs": 1962,
+   "heldout": 262,
    "bySource": {
-    "smol": 2012
+    "smol": 1962
    },
    "withStandard": 0,
    "withTerms": 0,
-   "bytes": 635563,
-   "sha256": "f650c5f427586ba1baf17cef5d152ee56aa2b8bbd66e32ad0bbd0103846f7769",
+   "bytes": 622666,
+   "sha256": "cd9c553b212c99f2bedc59cf17135f90acf0d05e4d309f621ed351d66f2500af",
    "rejected": {
     "script": 2416,
     "length": 189,
@@ -237,16 +237,16 @@
   },
   "ar-TN": {
    "file": "ar-TN.tsv",
-   "pairs": 2119,
-   "heldout": 247,
+   "pairs": 2094,
+   "heldout": 272,
    "bySource": {
-    "smol": 2068,
-    "kaikki": 51
+    "smol": 2042,
+    "kaikki": 52
    },
    "withStandard": 0,
    "withTerms": 1187,
-   "bytes": 682744,
-   "sha256": "308a9c3fb961259fdb3f06654af3647c68d463c7a15e490524027b86534ce991",
+   "bytes": 675545,
+   "sha256": "80f83e8d6131be99ba5aed529991dd0f60f2c64538ca32bc6d538a532b9df322",
    "rejected": {
     "script": 2420,
     "length": 376,
