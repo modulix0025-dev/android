@@ -383,6 +383,21 @@ jobs:
           ./gradlew :engines:test --console=plain --tests '*TranslationQualityExperiment*' \
             -Pmodulex.mtEvalModels="$(cat "$RUNNER_TEMP/path.txt")"
 
+  tm-inventory:
+    name: Dialect corpus inventory (openly-licensed sources)
+    if: contains(github.event.head_commit.message, '[tm-inventory]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Count usable sentence pairs per dialect
+        run: python3 -I tools/tm_inventory.py --out "$RUNNER_TEMP/tm_inventory.json" | tee "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tm-inventory
+          path: ${{ runner.temp }}/tm_inventory.json
+
   signaling-image:
     name: Signaling relay Docker image
     runs-on: ubuntu-24.04
