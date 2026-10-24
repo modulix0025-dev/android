@@ -136,3 +136,30 @@
 خطوبة	engagement
 كتب الكتاب	marriage contract signing
 حماتي	my mother-in-law
+
+# Colloquial (mostly Egyptian) words the model was measured to misread (CI mt-eval)
+النهارده	today
+النهاردة	today
+امبارح	yesterday
+إمبارح	yesterday
+بكرة	tomorrow
+بكره	tomorrow
+دلوقتي	now
+عايز	want
+عايزة	want
+عاوز	want
+عاوزة	want
+الغدا	lunch
+العشا	dinner
+الفطار	breakfast
+فين	where
+إزاي	how
+ازاي	how
+أوي	very
+برضو	also
+مفيش	there is no
+معلش	never mind
+تذكرة قطر	train ticket
+تذكرة القطر	train ticket
+محطة القطر	train station
+ركبت القطر	took the train

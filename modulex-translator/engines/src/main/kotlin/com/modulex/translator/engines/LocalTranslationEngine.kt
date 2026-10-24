@@ -3,6 +3,7 @@ package com.modulex.translator.engines
 import com.modulex.translator.core.assets.GgufInfo
 import com.modulex.translator.core.language.Language
 import com.modulex.translator.core.translation.DecodingParams
+import com.modulex.translator.core.translation.Glossary
 import com.modulex.translator.core.translation.ModelInfo
 import com.modulex.translator.core.translation.OutputSanitizer
 import com.modulex.translator.core.translation.PromptBuilder
@@ -39,6 +40,9 @@ class LocalTranslationEngine(
     @Volatile private var cancelled = false
 
     override val isLoaded: Boolean get() = handle != 0L
+
+    /** Terminology hints added to the prompt for terms found in each piece (see [Glossary]). */
+    @Volatile var glossary: Glossary? = null
 
     override suspend fun load(modelPath: String, threads: Int, contextSize: Int): Result<ModelInfo> = withContext(Dispatchers.IO) {
         mutex.withLock {
@@ -88,7 +92,8 @@ class LocalTranslationEngine(
                 if (cancelled) return@withLock TranslationResult.Cancelled
                 val metrics = LongArray(4)
                 val raw = try {
-                    val formatted = NativeTranslator.nativeFormatPrompt(handle, PromptBuilder.build(piece.text, source, target))
+                    val hints = glossary?.hintsFor(piece.text, source.code, target.code).orEmpty()
+                    val formatted = NativeTranslator.nativeFormatPrompt(handle, PromptBuilder.build(piece.text, source, target, hints))
                     // Text already translated (with the original separators) precedes the live piece.
                     val prefix = StringBuilder()
                     outputs.forEachIndexed { i, o -> prefix.append(o).append(pieces[i].separatorAfter) }

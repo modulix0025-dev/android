@@ -7,12 +7,29 @@ import com.modulex.translator.core.language.LanguageRegistry
  * Builds the user turn for the translation model, following the prompt formats documented by the
  * model authors (English template, or the Chinese template when Chinese is involved). The chat
  * template itself (special tokens) is applied natively from the model's own GGUF metadata.
+ *
+ * [hints] use the authors' documented terminology form ("Reference the following translations").
+ * Measured on the real model (CI mt-eval, 36 hard ar<->en items): hints raise correct term
+ * renderings from 21 to 30, while quantisation (Q4_K_M/Q6_K/Q8_0), sampling vs. greedy and the
+ * instruction language each changed the result by at most one item.
  */
 object PromptBuilder {
-    fun build(text: String, source: Language, target: Language): String {
+    fun build(text: String, source: Language, target: Language, hints: List<Glossary.Hint> = emptyList()): String {
         val chinese = source.code in LanguageRegistry.chineseFamily || target.code in LanguageRegistry.chineseFamily
         return if (chinese && target.promptNameZh != null) {
-            "将以下文本翻译为${target.promptNameZh}，注意只需要输出翻译后的结果，不要额外解释：\n\n$text"
+            buildString {
+                if (hints.isNotEmpty()) {
+                    append("参考下面的翻译：\n")
+                    hints.forEach { append(it.source).append(" 翻译成 ").append(it.target).append('\n') }
+                }
+                append("将以下文本翻译为${target.promptNameZh}，注意只需要输出翻译后的结果，不要额外解释：\n\n$text")
+            }
+        } else if (hints.isNotEmpty()) {
+            buildString {
+                append("Reference the following translations:\n")
+                hints.forEach { append(it.source).append(" translates to ").append(it.target).append('\n') }
+                append("\nTranslate the following text into ${target.promptNameEn}. Note that you must ONLY output the translated result without any additional explanation:\n\n$text")
+            }
         } else {
             "Translate the following text into ${target.promptNameEn}. Note that you should only output the translated result without any additional explanation:\n\n$text"
         }

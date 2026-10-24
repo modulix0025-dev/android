@@ -20,6 +20,19 @@ class TranslationTest {
         assertTrue(PromptBuilder.build("你好", zh, ar).startsWith("将以下文本翻译为阿拉伯语"))
     }
 
+    @Test
+    fun terminologyHintsUseTheDocumentedForm() {
+        val ar = LanguageRegistry.require("ar"); val en = LanguageRegistry.require("en"); val zh = LanguageRegistry.require("zh")
+        val hints = listOf(Glossary.Hint("جنيه", "pound"))
+        assertEquals(
+            "Reference the following translations:\nجنيه translates to pound\n\nTranslate the following text into English. " +
+                "Note that you must ONLY output the translated result without any additional explanation:\n\nبعشرين جنيه",
+            PromptBuilder.build("بعشرين جنيه", ar, en, hints),
+        )
+        assertTrue(PromptBuilder.build("x", en, zh, listOf(Glossary.Hint("pound", "英镑"))).startsWith("参考下面的翻译：\npound 翻译成 英镑\n将以下文本翻译为中文"))
+        assertEquals(PromptBuilder.build("مرحبا", ar, en), PromptBuilder.build("مرحبا", ar, en, emptyList()))
+    }
+
     private fun reconstruct(p: List<TextSegmenter.Piece>) = p.joinToString("") { it.text + it.separatorAfter }
 
     @Test

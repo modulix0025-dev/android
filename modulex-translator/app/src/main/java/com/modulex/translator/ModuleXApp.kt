@@ -16,6 +16,7 @@ import com.modulex.translator.tts.SpeechOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import com.modulex.translator.core.translation.Glossary
 import kotlinx.coroutines.launch
 
 /** Manual dependency container: a handful of app-wide singletons, created lazily. */
@@ -27,7 +28,15 @@ class AppContainer(context: Context) {
     val history by lazy { HistoryRepository(app) }
     val device by lazy { DeviceStatus(app) }
     val packs by lazy { PackManager(app, scope) }
-    val engines by lazy { EngineHub(packs, device, settings) }
+    /** Terminology hints shipped in assets/glossary (<from>-<to>.tsv). */
+    val glossary by lazy {
+        val files = app.assets.list("glossary").orEmpty().filter { it.endsWith(".tsv") }
+        Glossary(files.flatMap { name ->
+            val (from, to) = name.removeSuffix(".tsv").split("-")
+            Glossary.parseTsv(app.assets.open("glossary/$name").bufferedReader().use { it.readText() }, from, to)
+        })
+    }
+    val engines by lazy { EngineHub(packs, device, settings).also { it.setGlossary(glossary) } }
     val capture by lazy { AudioCapture(app) }
     val voice by lazy { VoicePipeline(engines, capture) }
     val speech by lazy { SpeechOutput(app, packs, settings) }

@@ -71,6 +71,21 @@ Observations from the corpus output (human review still required): meaning was p
 «الرصيف», Western vs Arabic-Indic digits) rather than errors. One grammatical slip in ar→en:
 "a engineer". Egyptian colloquial input («انا عايز اروح المطار بسرعه») was translated correctly.
 
+### Hard terms: quantisation, decoding, prompt and glossary (CI `mt-eval`, run 40081462965)
+36 hard items (Arabic currency, religious, food and Egyptian colloquial terms; 6 en->ar), scored by
+required English/Arabic keywords; every output is printed in the job log.
+
+| Configuration | Q4_K_M | Q6_K | Q8_0 |
+|---|---|---|---|
+| plain prompt (greedy or sampled, English or Chinese instruction) | 20-21/36 | 21/36 | 21-22/36 |
+| with terminology hints | 30/36 | 29-30/36 | 30/36 |
+| mean time per item (4-core runner) | ~1.0 s | ~0.7 s | ~1.5 s |
+
+Conclusion: the failures reported by users (terms copied or transliterated: «جنيه» -> "Gneih",
+«الأسانسير» -> "Asansir", «الكشري» -> "Al-Kashri") are knowledge gaps of the 1.8B model, not an
+artefact of quantisation, sampling or prompt language. Terminology hints in the authors' documented
+format fix them; the app now sends hints from a curated glossary (assets/glossary). Q4_K_M stays.
+
 ## Device measurements: not yet available
 | Measurement | Target (planning) | Result |
 |---|---|---|

@@ -358,7 +358,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quant: [Q4_K_M, Q6_K, Q8_0]
+        quant: [Q4_K_M, Q8_0]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
