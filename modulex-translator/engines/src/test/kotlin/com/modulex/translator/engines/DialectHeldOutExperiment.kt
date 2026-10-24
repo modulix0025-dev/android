@@ -31,7 +31,7 @@ class DialectHeldOutExperiment {
 
     private val glossary: Glossary by lazy {
         Glossary(File("../app/src/main/assets/glossary").listFiles { f -> f.name.endsWith(".tsv") }!!.flatMap { f ->
-            val (from, to) = f.name.removeSuffix(".tsv").split("-")
+            val (from, to) = f.name.substringBefore(".").split("-") // <from>-<to>[.<list>].tsv
             Glossary.parseTsv(f.readText(), from, to)
         })
     }

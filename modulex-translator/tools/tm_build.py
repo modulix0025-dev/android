@@ -13,13 +13,15 @@ Terms: dialect lemmas (Wiktionary, approved) that occur in the source, matched l
 Split: a stable 10% (by hash of the normalised source) is held out for evaluation and never shipped
 as a reference; it goes to engines/src/test/resources/tm-heldout/.
 
-Usage: tm_build.py --raw DIR [--seed 7]
+Usage: tm_build.py --raw DIR [--raw DIR2 ...] [--seed 7]
 """
 import argparse
+import glob
 import hashlib
 import json
 import os
 import random
+import tempfile
 import re
 import sys
 import unicodedata
@@ -31,6 +33,11 @@ from tm_sources import read_rows, write_rows  # noqa: E402
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 ASSETS = os.path.join(ROOT, "app", "src", "main", "assets", "tm")
 HELDOUT = os.path.join(ROOT, "engines", "src", "test", "resources", "tm-heldout")
+GLOSSARY = os.path.join(ROOT, "app", "src", "main", "assets", "glossary", "ar-en.wiktionary.tsv")
+# Words with several everyday meanings never become hints (same rule as glossary/ar-en.tsv).
+AMBIGUOUS = {"وقف", "قرش", "مية", "ميه", "عيش", "اذان", "أذان", "آذان", "عين", "بنك", "سنة", "سنه", "كلمة", "حلو"}
+SKIP_TAGS = {"form-of", "alt-of", "plural", "obsolete", "archaic", "rare", "abbreviation", "misspelling", "vulgar",
+             "derogatory", "offensive"}
 APPROVED = os.path.join(os.path.dirname(__file__), "tm_sources_approved.json")
 HEADER = ["id", "dialect", "source", "standard", "en", "terms", "domain", "provenance", "license"]
 SOURCE_ORDER = ["flores", "tatoeba", "doda", "kaikki"]  # earlier sources win exact/near duplicates
@@ -148,16 +155,58 @@ def build_dialect(raw, dialect, approved, domains):
     return kept, held, reasons
 
 
+def clean_gloss(g):
+    g = re.sub(r"\([^)]*\)", "", g).split(";")[0].split(",")[0].strip().rstrip(".")
+    return g if g and len(g.split()) <= 4 and not re.search(r"\bof\b|\bform\b|\bsee\b", g, re.I) else ""
+
+
+def build_glossary(raw, approved, msa, existing):
+    """Dialect -> English hints from approved Wiktionary data: one meaning only, not an ordinary MSA word,
+    not already in the curated list, not a known ambiguous word."""
+    if "kaikki" not in approved:
+        return []
+    senses = {}
+    for path in sorted(glob.glob(os.path.join(raw, "kaikki", "*.terms.tsv"))):
+        for row in read_rows(path):
+            if len(row) < 3:
+                continue
+            word, pos, gloss = row[0].strip(), row[1], row[2]
+            tags = set(row[3].split(";")) if len(row) > 3 else set()
+            form = glossary_norm(word)
+            if len(form.replace(" ", "")) < 3 or script_share(word, True) < 0.99:
+                continue
+            if pos in ("name", "character", "symbol", "romanization", "prefix", "suffix") or tags & SKIP_TAGS:
+                senses.setdefault(form, set()).add("<excluded>")
+                continue
+            senses.setdefault(form, set()).add(clean_gloss(gloss) or "<unclear>")
+    out = []
+    for form, gl in sorted(senses.items()):
+        if len(gl) != 1 or next(iter(gl)).startswith("<") or form in AMBIGUOUS or form in existing:
+            continue
+        if " " not in form and msa.get(normalise(form, True), 0) > MSA_MAX:
+            continue
+        out.append([form, next(iter(gl))])
+    return out
+
+
 def write_tsv(path, rows):
     write_rows(path, [HEADER] + rows)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--raw", required=True)
+    ap.add_argument("--raw", required=True, action="append",
+                    help="raw source directory; repeatable, the first one that has a source wins (CI passes its own "
+                         "fetch plus data/tm-raw, where sources fetched locally with a personal token are committed)")
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--sample", type=int, default=200)
     a = ap.parse_args()
+    merged = tempfile.mkdtemp(prefix="tm-raw-")
+    for raw in a.raw:
+        for source in (os.listdir(raw) if os.path.isdir(raw) else []):
+            if os.path.isdir(os.path.join(raw, source)) and not os.path.exists(os.path.join(merged, source)):
+                os.symlink(os.path.abspath(os.path.join(raw, source)), os.path.join(merged, source))
+    a.raw = merged
     cfg = json.load(open(APPROVED, encoding="utf-8"))
     approved = {k for k, v in cfg["sources"].items() if v.get("approved")}
     domains = {k: v.get("domain", "general") for k, v in cfg["sources"].items()}
@@ -183,6 +232,18 @@ def main():
                                   "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "rejected": reasons}
         print(f"| {d} | {len(kept)} | {len(held)} | {', '.join(f'{k}: {v}' for k, v in sorted(reasons.items()))} | {len(data)} |")
     json.dump(manifest, open(os.path.join(ASSETS, "manifest.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    curated = os.path.join(os.path.dirname(GLOSSARY), "ar-en.tsv")
+    existing = {glossary_norm(r[0]) for r in read_rows(curated) if r and not r[0].startswith("#")} if os.path.exists(curated) else set()
+    gloss = build_glossary(a.raw, approved, msa_words(a.raw), existing)
+    with open(GLOSSARY, "w", encoding="utf-8") as fh:
+        fh.write("# Dialect -> English terminology hints generated by tools/tm_build.py from Wiktionary (CC BY-SA 4.0,\n"
+                 "# Wiktionary contributors, via kaikki.org). Only words with a single meaning that are not ordinary MSA\n"
+                 "# words (Tatoeba MSA frequency) and not known ambiguous words. Do not edit by hand.\n")
+        for r in gloss:
+            fh.write("\t".join(r) + "\n")
+    print(f"\nDialect glossary: {len(gloss)} entries -> {os.path.relpath(GLOSSARY, ROOT)}")
+    for r in gloss[:: max(1, len(gloss) // 40)][:40]:
+        print(f"   {r[0]} -> {r[1]}")
     for d in manifest["corpora"]:
         rows = read_rows(os.path.join(ASSETS, f"{d}.tsv"))[1:]
         print(f"\n### Random sample for manual review: {d} ({min(a.sample, len(rows))} of {len(rows)})")

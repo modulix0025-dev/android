@@ -33,7 +33,7 @@ class AppContainer(context: Context) {
     val glossary by lazy {
         val files = app.assets.list("glossary").orEmpty().filter { it.endsWith(".tsv") }
         Glossary(files.flatMap { name ->
-            val (from, to) = name.removeSuffix(".tsv").split("-")
+            val (from, to) = name.substringBefore(".").split("-") // <from>-<to>[.<list>].tsv
             Glossary.parseTsv(app.assets.open("glossary/$name").bufferedReader().use { it.readText() }, from, to)
         })
     }

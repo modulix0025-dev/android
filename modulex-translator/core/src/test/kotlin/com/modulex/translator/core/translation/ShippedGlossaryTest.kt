@@ -40,4 +40,23 @@ class ShippedGlossaryTest {
         assertTrue(hints("العيش المشترك مهم").isEmpty(), "العيش = living/coexistence")
         assertTrue(hints("He lifted five pounds", "en", "ar").isEmpty(), "weight, not money")
     }
+
+    /** The Wiktionary-derived dialect list (tools/tm_build.py) obeys the same rules as the curated one. */
+    @Test
+    fun generatedDialectListIsUnambiguous() {
+        val f = File(dir, "ar-en.wiktionary.tsv")
+        if (!f.exists()) return
+        val entries = Glossary.parseTsv(f.readText(), "ar", "en")
+        val lines = f.readLines().filter { it.isNotBlank() && !it.startsWith("#") }
+        lines.forEach { assertEquals(2, it.split('\t').size, "ar-en.wiktionary.tsv: '$it'") }
+        assertEquals(lines.size, entries.size)
+        assertEquals(entries.size, entries.map { Glossary.normalise(it.source, "ar") }.toSet().size, "duplicate terms")
+        val all = Glossary(Glossary.parseTsv(File(dir, "ar-en.tsv").readText(), "ar", "en") + entries)
+        for (word in listOf("وقف", "قرش", "مية", "عيش", "أذان", "آذان", "عين", "بنك")) {
+            assertTrue(entries.none { Glossary.normalise(it.source, "ar") == Glossary.normalise(word, "ar") }, "ambiguous «$word» listed")
+        }
+        assertTrue(all.hintsFor("أعلنوا وقف إطلاق النار", "ar", "en").isEmpty(), "وقف = stop, not endowment")
+        assertTrue(all.hintsFor("شاهدنا سمك القرش", "ar", "en").isEmpty(), "قرش = shark here")
+        assertTrue(all.hintsFor("العيش المشترك مهم", "ar", "en").isEmpty(), "العيش = living/coexistence")
+    }
 }

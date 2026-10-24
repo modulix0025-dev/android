@@ -70,7 +70,7 @@ class TranslationQualityExperiment {
     private val glossary: Glossary by lazy {
         val dir = File("../app/src/main/assets/glossary")
         Glossary(dir.listFiles { f -> f.name.endsWith(".tsv") }!!.flatMap { f ->
-            val (from, to) = f.name.removeSuffix(".tsv").split("-")
+            val (from, to) = f.name.substringBefore(".").split("-") // <from>-<to>[.<list>].tsv
             Glossary.parseTsv(f.readText(), from, to)
         })
     }
