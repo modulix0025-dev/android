@@ -137,6 +137,15 @@ def arabic_gloss(phrase, cache):
     return None
 
 
+DESCRIPTION = re.compile(r"\b(?:used|honorific|said|expression|phrase|formula|uttered)\b", re.I)
+
+
+def clean_target(w):
+    # Soft hyphens and zero-width spaces; the stress accents Wiktionary adds to Russian/Ukrainian (иншалла́х).
+    w = w.replace("\u00ad", "").replace("\u200b", "").replace("\u0301", "")
+    return w.strip(" :;\"'“”«»")
+
+
 def translations(entry, must, cache):
     """Wiktionary code -> first listed translation, from the trans-top table of the right sense."""
     en = section(wikitext(entry, cache), "English")
@@ -163,7 +172,12 @@ def main():
     missing = []
     for phrase, variants, entry, must in TERMS:
         assert phrase not in NEVER and not set(variants) & NEVER
-        en = arabic_gloss(phrase, a.cache) or arabic_gloss(phrase.removeprefix("ال"), a.cache)
+        # Single-word terms take the English entry's own headword (hajj, qibla, wudu): an Arabic entry's first
+        # sense is often another word (قبلة "kiss", حج "to overcome"). Expressions take the definition of their
+        # own exact entry, unless it describes usage instead of translating.
+        en = entry if " " not in phrase else (arabic_gloss(phrase, a.cache) or entry)
+        if DESCRIPTION.search(en):
+            en = entry
         tr = translations(entry, must, a.cache)
         if en:
             for v in [phrase] + variants:
@@ -183,7 +197,8 @@ def main():
         path = os.path.join(OUT, f"ar-{lang}.islamic.tsv")
         seen, keep = set(), []
         for src, tgt in rs:
-            if src not in seen and "\t" not in tgt:
+            tgt = clean_target(tgt)
+            if tgt and src not in seen and "\t" not in tgt:
                 seen.add(src)
                 keep.append(f"{src}\t{tgt}")
         if keep:
