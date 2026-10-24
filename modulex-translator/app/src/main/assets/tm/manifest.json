@@ -20,6 +20,21 @@
    "share_alike": "the shipped tm/*.tsv files that contain Wiktionary rows are themselves CC BY-SA 4.0",
    "domain": "dictionary-example"
   },
+  "oldi_seed": {
+   "approved": true,
+   "license": "CC-BY-SA-4.0",
+   "attribution": "OLDI Seed, Open Language Data Initiative (https://oldi.org); NLLB Seed authors",
+   "evidence": "dataset card: 'licensed under CC BY-SA 4.0', 'expert-generated', 'intended to be used to kick-start machine translation models'; not gated",
+   "share_alike": "the corpus files that contain these rows are CC BY-SA 4.0",
+   "domain": "wikipedia"
+  },
+  "smol": {
+   "approved": true,
+   "license": "CC-BY-4.0",
+   "attribution": "Google SMOL / GATITOS (https://huggingface.co/datasets/google/smol)",
+   "evidence": "dataset card: '## License This data is released under cc-by-4.0'; professional translations from English (SmolSent, SmolDoc; SmolDoc English sides were model-written, the translations are human)",
+   "domain": "general"
+  },
   "tatoeba": {
    "approved": true,
    "license": "CC-BY-2.0-FR",
@@ -31,158 +46,212 @@
  "corpora": {
   "ar-AE": {
    "file": "ar-AE.tsv",
-   "pairs": 114,
-   "heldout": 14,
+   "pairs": 94,
+   "heldout": 12,
    "bySource": {
-    "tatoeba": 17,
-    "kaikki": 97
+    "tatoeba": 14,
+    "kaikki": 80
    },
    "withStandard": 1,
-   "withTerms": 73,
-   "bytes": 34489,
-   "sha256": "0821022772dfcb94cf562cc7e29595ba435be52da05a9aad57688780c7bfa3b4",
+   "withTerms": 58,
+   "bytes": 25564,
+   "sha256": "a4c197797b5ba8b3f636c4dfa3da9effa906eb80bc02f4ae2fa279cc999ebdc0",
    "rejected": {
     "length": 181,
+    "looks-msa": 6,
     "schema": 46,
-    "script": 2,
-    "exact-dup": 2
+    "script": 1,
+    "exact-dup": 1
    }
   },
   "ar-DZ": {
    "file": "ar-DZ.tsv",
-   "pairs": 629,
-   "heldout": 68,
+   "pairs": 623,
+   "heldout": 67,
    "bySource": {
-    "tatoeba": 629
+    "tatoeba": 623
    },
    "withStandard": 8,
    "withTerms": 0,
-   "bytes": 142183,
-   "sha256": "ba884e43078d09558d2fa73607377e24f9fe1844948fe468876e916d63579c62",
+   "bytes": 140995,
+   "sha256": "17f88d07af125ebade871842fa4e2eb11defd450b6fdf3233563d47535fa2e89",
    "rejected": {
     "length": 1052,
     "schema": 700,
+    "looks-msa": 8,
     "script": 8,
-    "near-dup": 3
+    "near-dup": 2
    }
   },
   "ar-EG": {
    "file": "ar-EG.tsv",
-   "pairs": 434,
-   "heldout": 41,
+   "pairs": 9826,
+   "heldout": 1055,
    "bySource": {
-    "tatoeba": 366,
-    "kaikki": 68
+    "oldi_seed": 5498,
+    "smol": 3938,
+    "tatoeba": 350,
+    "kaikki": 40
    },
    "withStandard": 5,
-   "withTerms": 240,
-   "bytes": 103927,
-   "sha256": "a6b0a56748f2747cb0c485e418182df53bfcf0fdfa05beac55cd8893055cf371",
+   "withTerms": 4733,
+   "bytes": 3964057,
+   "sha256": "33cd490c6f0b1fdca6ed0a780c35de382f62cdc75beff3304de79a82dc7b668f",
    "rejected": {
-    "length": 1090,
+    "looks-msa": 288,
+    "length": 1464,
+    "script": 4792,
+    "exact-dup": 5,
     "schema": 258
    }
   },
   "ar-IQ": {
    "file": "ar-IQ.tsv",
-   "pairs": 4,
+   "pairs": 3,
    "heldout": 1,
    "bySource": {
-    "tatoeba": 4
+    "tatoeba": 3
    },
    "withStandard": 2,
    "withTerms": 0,
-   "bytes": 1091,
-   "sha256": "b2fa8c9d33b3b2435e62ca516b3e52e1c007bf658293c538ec7e40d2de0fd9fc",
+   "bytes": 864,
+   "sha256": "6f98a371361039d46c8bb6c32f9be62c338612856569257521d89b7c91eff6a4",
    "rejected": {
     "schema": 42,
-    "length": 11
+    "length": 11,
+    "looks-msa": 1
    }
   },
   "ar-LB": {
    "file": "ar-LB.tsv",
-   "pairs": 184,
-   "heldout": 16,
+   "pairs": 138,
+   "heldout": 12,
    "bySource": {
-    "tatoeba": 13,
-    "kaikki": 171
+    "tatoeba": 12,
+    "kaikki": 126
    },
    "withStandard": 2,
-   "withTerms": 121,
-   "bytes": 58694,
-   "sha256": "ede306ea8ce392a61c34759387c980e353b3e3a05955436957baf07d33ebb01b",
+   "withTerms": 87,
+   "bytes": 37442,
+   "sha256": "8f5c1aecfe72c0b71d651362b53e84985de1ce6c3cbad05f8bd9fff424699615",
    "rejected": {
-    "length": 221,
+    "length": 211,
     "schema": 26,
-    "script": 96,
-    "exact-dup": 5
+    "script": 33,
+    "looks-msa": 1,
+    "exact-dup": 3
+   }
+  },
+  "ar-LY": {
+   "file": "ar-LY.tsv",
+   "pairs": 2029,
+   "heldout": 221,
+   "bySource": {
+    "smol": 2029
+   },
+   "withStandard": 0,
+   "withTerms": 0,
+   "bytes": 634324,
+   "sha256": "ee46c3d7ae6a623286aef89b6b21a718e05c6e250079cb3575832aeb99a9d02d",
+   "rejected": {
+    "script": 2423,
+    "length": 195,
+    "looks-msa": 75,
+    "exact-dup": 1,
+    "schema": 3
    }
   },
   "ar-MA": {
    "file": "ar-MA.tsv",
-   "pairs": 174,
-   "heldout": 19,
+   "pairs": 5706,
+   "heldout": 630,
    "bySource": {
+    "oldi_seed": 5538,
     "tatoeba": 10,
-    "kaikki": 164
+    "kaikki": 158
    },
    "withStandard": 0,
-   "withTerms": 149,
-   "bytes": 48676,
-   "sha256": "2f42a7529f8b23871432205fe694684243d9e60356bf3d6f5fba5893137682b0",
+   "withTerms": 3619,
+   "bytes": 2636885,
+   "sha256": "5befc6777e6a3eeb2f472408d492f0b1bf9eac54e81cb55b954ed3af6a173ebb",
    "rejected": {
-    "script": 2,
-    "length": 234,
+    "looks-msa": 18,
+    "length": 250,
+    "script": 9,
+    "exact-dup": 2,
     "schema": 50
    }
   },
   "ar-PS": {
    "file": "ar-PS.tsv",
-   "pairs": 261,
-   "heldout": 44,
+   "pairs": 245,
+   "heldout": 43,
    "bySource": {
-    "tatoeba": 49,
-    "kaikki": 212
+    "tatoeba": 46,
+    "kaikki": 199
    },
    "withStandard": 2,
-   "withTerms": 199,
-   "bytes": 73396,
-   "sha256": "a73311e5ea2fffd354156aa906a86ff324b1fadcbf7637cc36aba0af895bd84d",
+   "withTerms": 193,
+   "bytes": 66785,
+   "sha256": "be1e22e9a3cf9faf8691b6190636d9362aaa8f8de64d39a85ed57f8a7563d069",
    "rejected": {
     "schema": 14,
     "length": 699,
-    "script": 4,
+    "looks-msa": 8,
     "exact-dup": 6
    }
   },
   "ar-SA": {
    "file": "ar-SA.tsv",
-   "pairs": 31,
+   "pairs": 28,
    "heldout": 1,
    "bySource": {
-    "kaikki": 31
+    "kaikki": 28
    },
    "withStandard": 0,
    "withTerms": 19,
-   "bytes": 7827,
-   "sha256": "507e4c76a5b6a3bf085eb75a5d1f0f5e85db83958c7381aa9884c5810c8548fa",
+   "bytes": 7096,
+   "sha256": "0d3415ff9dac09f60f18ed7ed879dc7fe387ed1e1adedbbd644606e63cf7f607",
    "rejected": {
-    "length": 132
+    "length": 132,
+    "looks-msa": 3
+   }
+  },
+  "ar-SD": {
+   "file": "ar-SD.tsv",
+   "pairs": 2012,
+   "heldout": 212,
+   "bySource": {
+    "smol": 2012
+   },
+   "withStandard": 0,
+   "withTerms": 0,
+   "bytes": 635563,
+   "sha256": "f650c5f427586ba1baf17cef5d152ee56aa2b8bbd66e32ad0bbd0103846f7769",
+   "rejected": {
+    "script": 2416,
+    "length": 189,
+    "looks-msa": 97,
+    "exact-dup": 2
    }
   },
   "ar-TN": {
    "file": "ar-TN.tsv",
-   "pairs": 53,
-   "heldout": 3,
+   "pairs": 2119,
+   "heldout": 247,
    "bySource": {
-    "kaikki": 53
+    "smol": 2068,
+    "kaikki": 51
    },
    "withStandard": 0,
-   "withTerms": 39,
-   "bytes": 15876,
-   "sha256": "95b8ef54465cd1d99d072036c6f4c70f6a1ea6a4c161f6658c996effa534999f",
+   "withTerms": 1187,
+   "bytes": 682744,
+   "sha256": "308a9c3fb961259fdb3f06654af3647c68d463c7a15e490524027b86534ce991",
    "rejected": {
-    "length": 193
+    "script": 2420,
+    "length": 376,
+    "looks-msa": 22,
+    "exact-dup": 1
    }
   }
  }
