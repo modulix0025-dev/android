@@ -1,0 +1,189 @@
+{
+ "schema": 1,
+ "columns": [
+  "id",
+  "dialect",
+  "source",
+  "standard",
+  "en",
+  "terms",
+  "domain",
+  "provenance",
+  "license"
+ ],
+ "sources": {
+  "kaikki": {
+   "approved": true,
+   "license": "CC-BY-SA-4.0",
+   "attribution": "Wiktionary contributors (https://en.wiktionary.org), extracted with wiktextract / kaikki.org (Tatu Ylonen)",
+   "evidence": "Wiktionary text is CC BY-SA 4.0 (and GFDL); kaikki.org redistributes the extracted entries",
+   "share_alike": "the shipped tm/*.tsv files that contain Wiktionary rows are themselves CC BY-SA 4.0",
+   "domain": "dictionary-example"
+  },
+  "tatoeba": {
+   "approved": true,
+   "license": "CC-BY-2.0-FR",
+   "attribution": "Tatoeba (https://tatoeba.org) contributors; each pair names its sentence ids and authors",
+   "evidence": "tatoeba.org/en/downloads: 'These files are released under CC BY 2.0 FR'; terms of use 6.2: CC-BY 2.0 FR default for text sentences, single condition attribution",
+   "domain": "daily"
+  }
+ },
+ "corpora": {
+  "ar-AE": {
+   "file": "ar-AE.tsv",
+   "pairs": 114,
+   "heldout": 14,
+   "bySource": {
+    "tatoeba": 17,
+    "kaikki": 97
+   },
+   "withStandard": 1,
+   "withTerms": 93,
+   "bytes": 35137,
+   "sha256": "6b5ee5342331a5b648c4f34ce7f0df4a40147351629b9e8a32368fd0dc504b08",
+   "rejected": {
+    "length": 181,
+    "schema": 46,
+    "script": 2,
+    "exact-dup": 2
+   }
+  },
+  "ar-DZ": {
+   "file": "ar-DZ.tsv",
+   "pairs": 629,
+   "heldout": 68,
+   "bySource": {
+    "tatoeba": 629
+   },
+   "withStandard": 8,
+   "withTerms": 0,
+   "bytes": 142183,
+   "sha256": "ba884e43078d09558d2fa73607377e24f9fe1844948fe468876e916d63579c62",
+   "rejected": {
+    "length": 1052,
+    "schema": 700,
+    "script": 8,
+    "near-dup": 3
+   }
+  },
+  "ar-EG": {
+   "file": "ar-EG.tsv",
+   "pairs": 434,
+   "heldout": 41,
+   "bySource": {
+    "tatoeba": 366,
+    "kaikki": 68
+   },
+   "withStandard": 5,
+   "withTerms": 382,
+   "bytes": 108996,
+   "sha256": "c79b45d3465b45cf50732fe8dd6d4242c02a4329321b7c14fd1b952c7c2bbc1b",
+   "rejected": {
+    "length": 1090,
+    "schema": 258
+   }
+  },
+  "ar-IQ": {
+   "file": "ar-IQ.tsv",
+   "pairs": 4,
+   "heldout": 1,
+   "bySource": {
+    "tatoeba": 4
+   },
+   "withStandard": 2,
+   "withTerms": 0,
+   "bytes": 1091,
+   "sha256": "b2fa8c9d33b3b2435e62ca516b3e52e1c007bf658293c538ec7e40d2de0fd9fc",
+   "rejected": {
+    "schema": 42,
+    "length": 11
+   }
+  },
+  "ar-LB": {
+   "file": "ar-LB.tsv",
+   "pairs": 184,
+   "heldout": 16,
+   "bySource": {
+    "tatoeba": 13,
+    "kaikki": 171
+   },
+   "withStandard": 2,
+   "withTerms": 156,
+   "bytes": 59938,
+   "sha256": "8e4597ecb0b2609eef452d884778040507010bc6b7e6f1d4ab93a3f01cfe7e75",
+   "rejected": {
+    "length": 221,
+    "schema": 26,
+    "script": 96,
+    "exact-dup": 5
+   }
+  },
+  "ar-MA": {
+   "file": "ar-MA.tsv",
+   "pairs": 174,
+   "heldout": 19,
+   "bySource": {
+    "tatoeba": 10,
+    "kaikki": 164
+   },
+   "withStandard": 0,
+   "withTerms": 171,
+   "bytes": 50470,
+   "sha256": "12fe0f73bd5af553707686b58b87dac26db16d9d2a3ba1554aa7936dd01de505",
+   "rejected": {
+    "script": 2,
+    "length": 234,
+    "schema": 50
+   }
+  },
+  "ar-PS": {
+   "file": "ar-PS.tsv",
+   "pairs": 261,
+   "heldout": 44,
+   "bySource": {
+    "tatoeba": 49,
+    "kaikki": 212
+   },
+   "withStandard": 2,
+   "withTerms": 259,
+   "bytes": 78183,
+   "sha256": "1758f78d4e9495b48034cea7d8a192081573952245b45bed76fd4027452d6fe4",
+   "rejected": {
+    "schema": 14,
+    "length": 699,
+    "script": 4,
+    "exact-dup": 6
+   }
+  },
+  "ar-SA": {
+   "file": "ar-SA.tsv",
+   "pairs": 31,
+   "heldout": 1,
+   "bySource": {
+    "kaikki": 31
+   },
+   "withStandard": 0,
+   "withTerms": 30,
+   "bytes": 8246,
+   "sha256": "f778ec466dcc6f24403c02cda3225ed2a7c23eeae5ac7ae140e01db40b11c766",
+   "rejected": {
+    "length": 132
+   }
+  },
+  "ar-TN": {
+   "file": "ar-TN.tsv",
+   "pairs": 53,
+   "heldout": 3,
+   "bySource": {
+    "kaikki": 53
+   },
+   "withStandard": 0,
+   "withTerms": 52,
+   "bytes": 16289,
+   "sha256": "118e0e6c757cd40e61e744e7167ad9c8adafa3a20b63884b91ba823b437d84a1",
+   "rejected": {
+    "length": 193
+   }
+  }
+ }
+}
