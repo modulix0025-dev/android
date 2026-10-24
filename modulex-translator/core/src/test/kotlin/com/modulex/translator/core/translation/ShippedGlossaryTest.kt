@@ -59,4 +59,27 @@ class ShippedGlossaryTest {
         assertTrue(all.hintsFor("شاهدنا سمك القرش", "ar", "en").isEmpty(), "قرش = shark here")
         assertTrue(all.hintsFor("العيش المشترك مهم", "ar", "en").isEmpty(), "العيش = living/coexistence")
     }
+
+    /** Islamic expressions into every app language (tools/tm_islamic.py, from Wiktionary). */
+    @Test
+    fun islamicListsAreWellFormedAndUnambiguous() {
+        val files = dir.listFiles { f -> f.name.endsWith(".islamic.tsv") }.orEmpty()
+        if (files.isEmpty()) return
+        val never = listOf("المغرب", "العشاء", "العصر", "الظهر", "سنة", "أذان", "آذان", "وقف", "عيش").map { Glossary.normalise(it, "ar") }
+        for (f in files) {
+            val to = f.name.substringBefore(".").substringAfter("-")
+            val lines = f.readLines().filter { it.isNotBlank() && !it.startsWith("#") }
+            lines.forEach { assertEquals(2, it.split('\t').size, "${f.name}: '$it'") }
+            val entries = Glossary.parseTsv(f.readText(), "ar", to)
+            assertTrue(entries.none { Glossary.normalise(it.source, "ar") in never }, "${f.name} lists an ambiguous word")
+            // Prayer names only as "صلاة ...": a sentence about Morocco or dinner gets no prayer hint.
+            val g = Glossary(entries)
+            assertTrue(g.hintsFor("سافرت إلى المغرب الصيف الماضي", "ar", to).isEmpty(), "${f.name}: المغرب is Morocco here")
+            assertTrue(g.hintsFor("العشاء جاهز على الطاولة", "ar", to).isEmpty(), "${f.name}: العشاء is dinner here")
+        }
+        File(dir, "ar-en.islamic.tsv").takeIf { it.exists() }?.let { f ->
+            val g = Glossary(Glossary.parseTsv(f.readText(), "ar", "en"))
+            assertTrue(g.hintsFor("انشالله نتقابل بكرة", "ar", "en").isNotEmpty(), "colloquial spelling of إن شاء الله")
+        }
+    }
 }

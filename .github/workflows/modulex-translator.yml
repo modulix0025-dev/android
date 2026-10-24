@@ -460,11 +460,12 @@ jobs:
         run: |
           set -o pipefail
           python3 tools/tm_build.py --raw "$RUNNER_TEMP/tm-raw" --raw data/tm-raw | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 -I tools/tm_islamic.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Commit the corpora to the branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/assets/tm engines/src/test/resources/tm-heldout app/src/main/assets/glossary/ar-en.wiktionary.tsv
+          git add app/src/main/assets/tm engines/src/test/resources/tm-heldout app/src/main/assets/glossary
           git commit -qm "Dialect corpora built by CI run ${{ github.run_id }} from the approved sources" || exit 0
           for i in 1 2 3; do
             git fetch -q origin "${{ github.ref_name }}" && git rebase -q FETCH_HEAD && git push -q origin "HEAD:${{ github.ref_name }}" && exit 0

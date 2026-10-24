@@ -11,3 +11,7 @@ Attribution: Wiktionary contributors; every pair names its Wiktionary entry in i
 field (https://en.wiktionary.org/wiki/<entry>).
 Share-alike: the corpus files that contain Wiktionary rows (assets/tm/*.tsv) are themselves
 licensed under CC BY-SA 4.0. This applies to those data files only, not to the application code.
+
+The same licence covers the generated glossaries assets/glossary/ar-en.wiktionary.tsv (dialect terms)
+and assets/glossary/ar-*.islamic.tsv (Islamic expressions: the Arabic entries' definitions and the
+English entries' translation tables).

@@ -36,7 +36,7 @@ every candidate). Every pair records its provenance and licence in its own row.
 | Source | Licence | Status | Notes |
 |--------|---------|--------|-------|
 | Tatoeba (tatoeba.org), dialect sentences and linked translations | CC BY 2.0 FR | **shipped** | Attribution per pair: sentence ids and contributor usernames in `provenance`. |
-| Wiktionary usage examples (via kaikki.org / wiktextract) | CC BY-SA 4.0 (+ GFDL) | **shipped** | Share-alike applies to the corpus files that contain these rows (not to app code). |
+| Wiktionary usage examples (via kaikki.org / wiktextract), dialect glossary `glossary/ar-en.wiktionary.tsv`, Islamic glossaries `glossary/ar-*.islamic.tsv` (Wiktionary API) | CC BY-SA 4.0 (+ GFDL) | **shipped** | Share-alike applies to these data files (not to app code). Only editor-written examples, no quotations. |
 | OLDI Seed (`openlanguagedata/oldi_seed`), Egyptian and Moroccan | CC BY-SA 4.0 | **shipped** | Expert translations of English Wikipedia sentences; not gated; meant for training MT. Share-alike on the corpus files. |
 | Google SMOL (`google/smol`): SmolSent, SmolDoc | CC BY 4.0 | **shipped** | Professional translations from English (Egyptian, Levantine, Tunisian, Sudanese, Libyan). GATITOS lexicon fetched, not yet used. |
 | `lahga/arabic-dialects`, Medical-Questionnaire-Multilingual-Translation | CC BY-SA 4.0 / CC BY 4.0 (cards) | not shipped | Provenance of the rows to be checked from samples first. |
