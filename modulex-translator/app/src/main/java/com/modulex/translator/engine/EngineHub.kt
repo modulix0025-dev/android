@@ -10,6 +10,7 @@ import com.modulex.translator.core.resources.ResourcePolicy
 import com.modulex.translator.core.resources.ThermalLevel
 import com.modulex.translator.core.translation.DecodingParams
 import com.modulex.translator.core.translation.Glossary
+import com.modulex.translator.core.translation.TranslationMemory
 import com.modulex.translator.core.translation.ModelInfo
 import com.modulex.translator.core.translation.TranslationError
 import com.modulex.translator.core.translation.TranslationResult
@@ -54,6 +55,7 @@ class EngineHub(
     private val translator = LocalTranslationEngine(expectedArchitecture = null)
 
     fun setGlossary(glossary: Glossary) { translator.glossary = glossary }
+    fun setTranslationMemory(memory: TranslationMemory) { translator.memory = memory }
     private val speech = LocalSpeechRecognizer()
     private val ocr = LocalTextRecognizer()
     val gate = InferenceGate(maxConcurrent = 2)

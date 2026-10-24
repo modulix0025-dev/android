@@ -36,6 +36,7 @@ tasks.test {
     providers.gradleProperty("modulex.testModel").orNull?.let { systemProperty("modulex.testModel", it) }
     providers.gradleProperty("modulex.testSpeechModel").orNull?.let { systemProperty("modulex.testSpeechModel", it) }
     providers.gradleProperty("modulex.mtEvalModels").orNull?.let { systemProperty("modulex.mtEvalModels", it) }
+    providers.gradleProperty("modulex.tmEvalPerDialect").orNull?.let { systemProperty("modulex.tmEvalPerDialect", it) }
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = true

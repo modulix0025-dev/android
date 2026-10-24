@@ -1,0 +1,10 @@
+Dialect sentence pairs from Tatoeba (https://tatoeba.org)
+
+The dialect corpora in this app (assets/tm/*.tsv) contain sentences and translations from the
+Tatoeba project, released under the Creative Commons Attribution 2.0 France licence (CC BY 2.0 FR):
+https://creativecommons.org/licenses/by/2.0/fr/deed.en
+
+Attribution: every pair taken from Tatoeba names, in its "provenance" field, the Tatoeba sentence
+ids and the usernames of the contributors who wrote the dialect sentence and its translations
+(https://tatoeba.org/sentences/show/<id>). The sentences were normalised only in whitespace; pairs
+were selected (length, script, duplicate checks) but not modified.

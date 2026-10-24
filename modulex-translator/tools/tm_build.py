@@ -70,22 +70,35 @@ def heldout(norm):
     return int(hashlib.sha1(norm.encode()).hexdigest()[:8], 16) % 10 == 0
 
 
-def load_terms(raw, dialect, approved):
-    """Single- and multi-word dialect lemmas of at least 3 letters from approved Wiktionary data."""
+MSA_MAX = 3  # a lemma found in more than this many Tatoeba MSA sentences is an ordinary MSA word, not a marker
+
+
+def msa_words(raw):
+    path = os.path.join(raw, "tatoeba", "ara.words.tsv")
+    return {r[0]: int(r[1]) for r in read_rows(path) if len(r) == 2} if os.path.exists(path) else {}
+
+
+def load_terms(raw, dialect, approved, msa):
+    """Dialect lemmas (approved Wiktionary data) of at least 3 letters that are not ordinary MSA words;
+    one spelling per matching form."""
     path = os.path.join(raw, "kaikki", f"{dialect}.terms.tsv")
     if "kaikki" not in approved or not os.path.exists(path):
         return []
-    seen = set()
+    by_form = {}
     for row in read_rows(path):
         w = row[0].strip()
-        if len(glossary_norm(w).replace(" ", "")) >= 3 and script_share(w, True) >= 0.99:
-            seen.add(w)
-    return sorted(seen, key=len, reverse=True)
+        form = glossary_norm(w)
+        if len(form.replace(" ", "")) < 3 or script_share(w, True) < 0.99:
+            continue
+        if " " not in form and msa.get(normalise(w, True), 0) > MSA_MAX:
+            continue
+        by_form.setdefault(form, w)
+    return sorted(by_form.values(), key=len, reverse=True)
 
 
 def build_dialect(raw, dialect, approved, domains):
     arabic = dialect.startswith("ar")
-    terms = [(t, term_regex(t)) for t in load_terms(raw, dialect, approved)]
+    terms = [(t, term_regex(t)) for t in load_terms(raw, dialect, approved, msa_words(raw))]
     kept, held, reasons = [], [], {}
     seen, index, grams_of = set(), {}, []
 
@@ -149,7 +162,7 @@ def main():
     approved = {k for k, v in cfg["sources"].items() if v.get("approved")}
     domains = {k: v.get("domain", "general") for k, v in cfg["sources"].items()}
     dialects = sorted({f[:-4] for s in approved if os.path.isdir(os.path.join(a.raw, s))
-                       for f in os.listdir(os.path.join(a.raw, s)) if f.endswith(".tsv") and not f.endswith(".terms.tsv")})
+                       for f in os.listdir(os.path.join(a.raw, s)) if f.endswith(".tsv") and f.count(".") == 1})
     manifest = {"schema": 1, "columns": HEADER, "sources": {k: cfg["sources"][k] for k in sorted(approved)}, "corpora": {}}
     rng = random.Random(a.seed)
     print("| dialect | shipped | held out | rejected (reason: count) | bytes |\n|---|---:|---:|---|---:|")

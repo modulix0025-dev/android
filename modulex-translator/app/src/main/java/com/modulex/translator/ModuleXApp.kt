@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import com.modulex.translator.core.translation.Glossary
+import com.modulex.translator.core.translation.TranslationMemory
 import kotlinx.coroutines.launch
 
 /** Manual dependency container: a handful of app-wide singletons, created lazily. */
@@ -36,7 +37,19 @@ class AppContainer(context: Context) {
             Glossary.parseTsv(app.assets.open("glossary/$name").bufferedReader().use { it.readText() }, from, to)
         })
     }
-    val engines by lazy { EngineHub(packs, device, settings).also { it.setGlossary(glossary) } }
+    /** Verified dialect sentence pairs shipped in assets/tm (<dialect>.tsv, see tools/tm_build.py). */
+    val translationMemory by lazy {
+        val files = app.assets.list("tm").orEmpty().filter { it.endsWith(".tsv") }
+        TranslationMemory(files.flatMap { name ->
+            val lang = TranslationMemory.baseLang(name.removeSuffix(".tsv"))
+            // The `en` column holds English, except in English-dialect corpora where it holds Arabic.
+            TranslationMemory.parseTsv(app.assets.open("tm/$name").bufferedReader().use { it.readText() }, lang,
+                if (lang == "en") "ar" else "en")
+        })
+    }
+    val engines by lazy {
+        EngineHub(packs, device, settings).also { it.setGlossary(glossary); it.setTranslationMemory(translationMemory) }
+    }
     val capture by lazy { AudioCapture(app) }
     val voice by lazy { VoicePipeline(engines, capture) }
     val speech by lazy { SpeechOutput(app, packs, settings) }

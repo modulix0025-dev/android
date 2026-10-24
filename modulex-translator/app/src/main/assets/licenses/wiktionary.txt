@@ -1,0 +1,13 @@
+Dialect usage examples and terms from Wiktionary (https://en.wiktionary.org)
+
+The dialect corpora in this app (assets/tm/*.tsv) contain usage examples with their English
+translations taken from English Wiktionary entries, as extracted by wiktextract / kaikki.org
+(Tatu Ylonen, https://kaikki.org). Wiktionary text is available under the Creative Commons
+Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0):
+https://creativecommons.org/licenses/by-sa/4.0/
+and the GNU Free Documentation License (https://en.wiktionary.org/wiki/Wiktionary:Copyrights).
+
+Attribution: Wiktionary contributors; every pair names its Wiktionary entry in its "provenance"
+field (https://en.wiktionary.org/wiki/<entry>).
+Share-alike: the corpus files that contain Wiktionary rows (assets/tm/*.tsv) are themselves
+licensed under CC BY-SA 4.0. This applies to those data files only, not to the application code.

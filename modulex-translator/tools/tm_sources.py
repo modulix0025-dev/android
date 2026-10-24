@@ -190,6 +190,12 @@ def tatoeba_links(code, other, cache):
 
 def tatoeba(out, cache):
     eng, ara = tatoeba_detailed("eng", cache), tatoeba_detailed("ara", cache)
+    # MSA word frequencies: tm_build drops "dialect terms" that are ordinary MSA words (or names like Tom).
+    freq = {}
+    for text, _ in ara.values():
+        for w in set(normalise(text, True).split()):
+            freq[w] = freq.get(w, 0) + 1
+    write_rows(f"{out}/tatoeba/ara.words.tsv", sorted(([w, str(n)] for w, n in freq.items()), key=lambda r: -int(r[1])))
     counts = {}
     for tag, codes in DIALECTS.items():
         code = codes.get("tatoeba")
@@ -262,7 +268,7 @@ def summarise(out):
         if not os.path.isdir(d):
             continue
         for f in sorted(os.listdir(d)):
-            if not f.endswith(".tsv") or f.endswith(".terms.tsv"):
+            if not f.endswith(".tsv") or f.count(".") != 1:
                 continue
             rows = [r for r in read_rows(os.path.join(d, f)) if len(r) == 6]
             ok = [r for r in rows if len(words(r[1])) >= 5 and r[3]]

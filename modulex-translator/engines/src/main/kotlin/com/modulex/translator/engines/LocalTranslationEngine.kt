@@ -4,6 +4,7 @@ import com.modulex.translator.core.assets.GgufInfo
 import com.modulex.translator.core.language.Language
 import com.modulex.translator.core.translation.DecodingParams
 import com.modulex.translator.core.translation.Glossary
+import com.modulex.translator.core.translation.TranslationMemory
 import com.modulex.translator.core.translation.ModelInfo
 import com.modulex.translator.core.translation.OutputSanitizer
 import com.modulex.translator.core.translation.PromptBuilder
@@ -43,6 +44,13 @@ class LocalTranslationEngine(
 
     /** Terminology hints added to the prompt for terms found in each piece (see [Glossary]). */
     @Volatile var glossary: Glossary? = null
+
+    /**
+     * Verified dialect sentence pairs (see [TranslationMemory]): a piece whose normalised text equals a
+     * stored sentence gets the stored translation without running the model; otherwise the most similar
+     * pairs are sent as references, before the glossary hints.
+     */
+    @Volatile var memory: TranslationMemory? = null
 
     override suspend fun load(modelPath: String, threads: Int, contextSize: Int): Result<ModelInfo> = withContext(Dispatchers.IO) {
         mutex.withLock {
@@ -90,9 +98,16 @@ class LocalTranslationEngine(
             val start = System.nanoTime()
             for (piece in pieces) {
                 if (cancelled) return@withLock TranslationResult.Cancelled
+                val tm = memory
+                val stored = tm?.exactMatch(piece.text, source.code, target.code)?.translations?.get(target.code)
+                if (stored != null) {
+                    outputs += stored
+                    continue
+                }
                 val metrics = LongArray(4)
                 val raw = try {
-                    val hints = glossary?.hintsFor(piece.text, source.code, target.code).orEmpty()
+                    val hints = tm?.references(piece.text, source.code, target.code).orEmpty() +
+                        glossary?.hintsFor(piece.text, source.code, target.code).orEmpty()
                     val formatted = NativeTranslator.nativeFormatPrompt(handle, PromptBuilder.build(piece.text, source, target, hints))
                     // Text already translated (with the original separators) precedes the live piece.
                     val prefix = StringBuilder()

@@ -380,7 +380,9 @@ jobs:
           python3 tools/ci_fetch_gguf.py --file "Hy-MT2-1.8B-${{ matrix.quant }}.gguf" --dest "$RUNNER_TEMP/m" $extra > "$RUNNER_TEMP/path.txt"
       - name: Run the experiment
         run: |
-          ./gradlew :engines:test --console=plain --tests '*TranslationQualityExperiment*' \
+          # The dialect held-out experiment (plain / glossary / glossary + corpus retrieval) runs on the shipped quantisation only.
+          extra=""; [ "${{ matrix.quant }}" = "Q4_K_M" ] && extra="--tests *DialectHeldOutExperiment*"
+          ./gradlew :engines:test --console=plain --tests '*TranslationQualityExperiment*' $extra \
             -Pmodulex.mtEvalModels="$(cat "$RUNNER_TEMP/path.txt")"
 
   tm-inventory:

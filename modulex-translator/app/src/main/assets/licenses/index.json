@@ -13,6 +13,8 @@
   {"name": "OkHttp / Okio", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "signaling connection (Apache-2.0 text)"},
   {"name": "Kotlin, kotlinx.coroutines, kotlinx.serialization, AndroidX, Jetpack Compose, CameraX", "license": "Apache-2.0", "file": "tesseract.txt", "scope": "application framework (Apache-2.0 text)"},
   {"name": "Piper (piper1-gpl)", "license": "GPL-3.0", "file": "piper.txt", "scope": "offline voices; only in builds made with -Pmodulex.withPiper=true"},
-  {"name": "eSpeak NG", "license": "GPL-3.0-or-later", "file": "espeak-ng.txt", "scope": "offline voices; only in builds made with -Pmodulex.withPiper=true"}
+  {"name": "eSpeak NG", "license": "GPL-3.0-or-later", "file": "espeak-ng.txt", "scope": "offline voices; only in builds made with -Pmodulex.withPiper=true"},
+  {"name": "Tatoeba sentences (dialect corpora)", "license": "CC-BY-2.0-FR", "file": "tatoeba.txt", "scope": "dialect sentence pairs used as translation references; per-pair authors in assets/tm"},
+  {"name": "Wiktionary usage examples (dialect corpora)", "license": "CC-BY-SA-4.0", "file": "wiktionary.txt", "scope": "dialect example sentences used as translation references; these corpus files are CC BY-SA 4.0"}
  ]
 }

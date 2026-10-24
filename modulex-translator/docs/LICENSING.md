@@ -27,6 +27,24 @@ in the manifest, notices, diagnostics and this file, as attribution requires.
 `cpp-httplib` is an archive dependency of llama.cpp's common library, but none of its code ends up
 in `libmx_ai.so` (no socket imports, checked with `nm`). It is therefore not listed in the app.
 
+## Dialect corpora (`app/src/main/assets/tm/`)
+
+Built by `tools/tm_build.py` from the sources approved in `tools/tm_sources_approved.json`. Each
+licence was read from the source itself in CI (job `tm-sources`, which prints the licence wording of
+every candidate). Every pair records its provenance and licence in its own row.
+
+| Source | Licence | Status | Notes |
+|--------|---------|--------|-------|
+| Tatoeba (tatoeba.org), dialect sentences and linked translations | CC BY 2.0 FR | **shipped** | Attribution per pair: sentence ids and contributor usernames in `provenance`. |
+| Wiktionary usage examples (via kaikki.org / wiktextract) | CC BY-SA 4.0 (+ GFDL) | **shipped** | Share-alike applies to the corpus files that contain these rows (not to app code). |
+| FLORES+ (`openlanguagedata/flores_plus`) | CC BY-SA 4.0 (dataset card) | not shipped | Gated on Hugging Face; needs an accepted gate and an `HF_TOKEN` secret; gate terms to be read first. |
+| Darija Open Dataset (DODa) | **CC BY-NC 4.0** (LICENSE file) | excluded | Non-commercial; the README asks commercial users to contact the authors. |
+| ArzEn-MultiGenre (Mendeley Data) | CC BY 4.0 (dataset page) | not shipped | Segments are taken from published song lyrics, novels and subtitles whose copyright is not the dataset authors'. Owner decision. |
+| PADIC | unknown | not shipped | Licence page not reachable from CI. |
+| Lisan (Birzeit) | CC BY 4.0 (reported) | not shipped | Licence page not reachable from CI; word glosses only, no sentence translations. |
+| MADAR, NADI | research / non-commercial | excluded | |
+| UFAL Parallel Corpus of North Levantine | CC BY-NC-SA 4.0 | excluded | Non-commercial. |
+
 ## Commercial-release checklist
 1. Hy-MT2 model-card metadata declares Apache-2.0 (recorded in the manifest). Read the full card text for any use notes.
 2. Decide on the voice engine: keep Piper off (system offline voices only), or ship a GPL-3.0 build
