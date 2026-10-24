@@ -15,6 +15,7 @@ Usage: tm_inventory.py --out inventory.json [--cache DIR]
 import argparse
 import bz2
 import csv
+import hashlib
 import io
 import json
 import os
@@ -37,7 +38,7 @@ UA = "ModuleX-Translator-corpus-inventory/1 (CI; github.com/modulix0025-dev/andr
 # Only dialects Tatoeba tags with their own ISO 639-3 code can be counted; regional variants it does
 # not separate (en-US/en-GB, es-MX/es-ES, pt-BR/pt-PT, fr-FR/fr-CA) show up with code None.
 DIALECTS = {
-    "ar": ("arb", [
+    "ar": ("ara", [  # Tatoeba files Modern Standard Arabic under the macro code "ara"
         ("ar-EG", "arz", "Egyptian"), ("ar-LB", "apc", "Levantine (North)"), ("ar-PS", "ajp", "Levantine (South)"),
         ("ar-IQ", "acm", "Mesopotamian"), ("ar-MA", "ary", "Moroccan"), ("ar-TN", "aeb", "Tunisian"),
         ("ar-DZ", "arq", "Algerian"), ("ar-LY", "ayl", "Libyan"), ("ar-SD", "apd", "Sudanese"),
@@ -100,7 +101,7 @@ def trigrams(words):
 
 
 def get(url, cache, retries=4):
-    name = os.path.join(cache, urllib.parse.quote(url, safe=""))
+    name = os.path.join(cache, hashlib.sha256(url.encode()).hexdigest())
     if os.path.exists(name):
         return open(name, "rb").read()
     for attempt in range(retries):
@@ -114,6 +115,8 @@ def get(url, cache, retries=4):
             if e.code == 404:
                 return None
             err = e
+            if e.code == 429:  # Wiktionary rate limit: back off longer
+                time.sleep(15 * (attempt + 1))
         except (urllib.error.URLError, TimeoutError) as e:
             err = e
         time.sleep(2 ** (attempt + 1))
@@ -176,6 +179,7 @@ def tatoeba(code, std, arabic, cache):
 
 
 def wikt_counts(cats, cache):
+    time.sleep(1)  # stay well under the API rate limit
     titles = "|".join("Category:" + c for c in cats)
     data = get(f"{WIKT}?action=query&prop=categoryinfo&format=json&formatversion=2&titles={urllib.parse.quote(titles)}", cache)
     pages = json.loads(data)["query"]["pages"]
