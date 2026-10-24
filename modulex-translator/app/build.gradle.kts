@@ -32,7 +32,8 @@ android {
 
         ndk {
             // Translation/speech inference needs 64-bit ARM with dot-product instructions.
-            abiFilters += listOf("arm64-v8a")
+            // CI emulator tests add x86_64 via -Pmodulex.abis=arm64-v8a,x86_64 (engines stay ARM-only at runtime).
+            abiFilters += providers.gradleProperty("modulex.abis").getOrElse("arm64-v8a").split(",").map { it.trim() }
         }
         externalNativeBuild {
             cmake {

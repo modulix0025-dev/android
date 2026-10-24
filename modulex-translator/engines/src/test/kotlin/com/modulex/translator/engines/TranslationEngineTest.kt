@@ -107,13 +107,24 @@ class TranslationEngineTest {
         engine.load(path!!, Runtime.getRuntime().availableProcessors().coerceAtMost(4), 4096).getOrThrow()
         println("model load ms=" + (System.nanoTime() - loadStart) / 1_000_000)
         val corpus = File("src/test/resources/corpus.tsv").readLines().drop(1).map { it.split('\t') }
+        val times = ArrayList<Long>()
+        val scores = HashMap<String, MutableList<Double>>()
         for (row in corpus) {
             val (src, tgt, text) = row
-            val r = engine.translate(text, LanguageRegistry.require(src), LanguageRegistry.require(tgt), DecodingParams())
+            // Greedy decoding so the reported quality is reproducible run to run.
+            val r = engine.translate(text, LanguageRegistry.require(src), LanguageRegistry.require(tgt), DecodingParams(temperature = 0f))
+            assertTrue(r is TranslationResult.Success, "translation failed: $r")
             val s = r as TranslationResult.Success
-            println("[$src->$tgt] ${s.metrics.totalMs}ms prompt=${s.metrics.promptTokens} gen=${s.metrics.generatedTokens}\n  IN : $text\n  OUT: ${s.text}\n  REF: ${row.getOrNull(3) ?: "-"}")
+            times += s.metrics.totalMs
+            val ref = row.getOrNull(3)
+            val chrf = ref?.let { chrF(s.text, it) }
+            if (chrf != null) scores.getOrPut("$src->$tgt") { ArrayList() } += chrf
+            println("[$src->$tgt] ${s.metrics.totalMs}ms prompt=${s.metrics.promptTokens} gen=${s.metrics.generatedTokens} chrF=${chrf?.let { "%.1f".format(it) }}\n  IN : $text\n  OUT: ${s.text}\n  REF: ${ref ?: "-"}")
             assertTrue(s.text.isNotBlank())
         }
+        times.sort()
+        println("CORPUS n=${times.size} median=${times[times.size / 2]} ms p95=${times[(times.size * 95) / 100]} ms; " +
+            scores.entries.joinToString { (k, v) -> "$k chrF=%.1f".format(v.average()) } + " (automatic metric; needs human review)")
         engine.unload()
     }
 }
@@ -123,4 +134,22 @@ internal fun LocalTranslationEngine.handleForTest(): Long {
     val f = LocalTranslationEngine::class.java.getDeclaredField("handle")
     f.isAccessible = true
     return f.getLong(this)
+}
+
+/** chrF (character n-gram F-score, n = 1..6, beta = 2), whitespace removed. 0..100. */
+internal fun chrF(hyp: String, ref: String, maxN: Int = 6, beta: Double = 2.0): Double {
+    val h = hyp.filterNot { it.isWhitespace() }
+    val r = ref.filterNot { it.isWhitespace() }
+    var p = 0.0; var rc = 0.0; var count = 0
+    for (n in 1..maxN) {
+        if (h.length < n || r.length < n) continue
+        val hg = h.windowed(n).groupingBy { it }.eachCount()
+        val rg = r.windowed(n).groupingBy { it }.eachCount()
+        val match = hg.entries.sumOf { (g, c) -> minOf(c, rg[g] ?: 0) }.toDouble()
+        p += match / hg.values.sum(); rc += match / rg.values.sum(); count++
+    }
+    if (count == 0) return 0.0
+    p /= count; rc /= count
+    if (p + rc == 0.0) return 0.0
+    return 100 * (1 + beta * beta) * p * rc / (beta * beta * p + rc)
 }

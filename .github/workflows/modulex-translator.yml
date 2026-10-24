@@ -1,0 +1,197 @@
+# CI for modulex-translator/: builds the APKs, runs JVM + host-native + emulator tests, evaluates
+# the real translation and speech models, and builds the signaling relay image.
+name: ModuleX Translator
+
+on:
+  push:
+    branches: ['claude/**', 'main', 'master']
+    paths: ['modulex-translator/**', '.github/workflows/modulex-translator.yml']
+  workflow_dispatch:
+    inputs:
+      gguf_file:
+        description: 'GGUF file in tencent/Hy-MT2-1.8B-GGUF (blank: auto-select Q4_K_M)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modulex-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NDK_VERSION: 28.2.13676358
+  CMAKE_VERSION: 3.22.1
+
+defaults:
+  run:
+    working-directory: modulex-translator
+
+jobs:
+  jvm-and-host-native:
+    name: JVM and host-native tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Host build tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build python3-numpy
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - run: ./gradlew :core:test :engines:test :signaling:test --console=plain
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jvm-test-results
+          path: modulex-translator/*/build/test-results/test/*.xml
+
+  android:
+    name: Android APKs, unit tests, lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" > /dev/null
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - name: Build
+        run: ./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --console=plain --stacktrace
+      - name: Verify native libraries (exports, no networking imports, 16 KB alignment)
+        run: |
+          NM="$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm"
+          mkdir -p build/apkcheck && cd build/apkcheck
+          unzip -oq ../../app/build/outputs/apk/debug/app-debug.apk 'lib/*'
+          fail=0
+          for so in lib/arm64-v8a/libmx_*.so; do
+            echo "== $so ($(stat -c %s "$so") bytes)"
+            "$NM" -D --defined-only "$so" | awk '{print $3}' | grep -v '^Java_\|^JNI_On' && { echo "unexpected export"; fail=1; }
+            if "$NM" -D --undefined-only "$so" | awk '{print $2}' | grep -wE 'socket|connect|getaddrinfo|gethostbyname|send|recv'; then echo "networking import"; fail=1; fi
+          done
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -P 16 -v 4 ../../app/build/outputs/apk/debug/app-debug.apk | tail -1
+          exit $fail
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apks
+          path: |
+            modulex-translator/app/build/outputs/apk/debug/*.apk
+            modulex-translator/app/build/outputs/apk/release/*.apk
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports
+          path: |
+            modulex-translator/app/build/reports/
+            modulex-translator/app/build/test-results/
+
+  emulator:
+    name: Instrumentation tests (emulator)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" > /dev/null
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - name: Build app and test APKs (arm64 + x86_64)
+        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          working-directory: modulex-translator
+          script: ./gradlew :app:connectedDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumentation-results
+          path: modulex-translator/app/build/outputs/androidTest-results/
+
+  model-eval:
+    name: Real models (download, verify, pin, translate, transcribe)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y ninja-build python3-numpy
+          python3 -m pip install --user --break-system-packages "huggingface_hub>=0.25"
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - name: Download and verify models
+        run: python3 tools/ci_fetch_models.py --dest "$RUNNER_TEMP/models" --out "$RUNNER_TEMP/pins.json" --gguf-file "${{ github.event.inputs.gguf_file }}"
+      - name: GGUF compatibility with the pinned llama.cpp
+        run: python3 tools/check_gguf.py third_party/llama.cpp/gguf-py "$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['translation']['path'])")"
+      - name: Translation corpus and speech sample with the real models
+        run: |
+          MODEL=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['translation']['path'])")
+          SPEECH=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['speech']['path'])")
+          ./gradlew :engines:test --console=plain \
+            --tests '*TranslationEngineTest.realModelTranslatesCorpus' --tests '*SpeechEngineTest.realModelTranscribesSample' \
+            -Pmodulex.testModel="$MODEL" -Pmodulex.testSpeechModel="$SPEECH"
+          grep -h -A400 '<system-out>' engines/build/test-results/test/*.xml | sed -n '1,400p'
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-eval
+          path: |
+            ${{ runner.temp }}/pins.json
+            modulex-translator/engines/build/test-results/test/*.xml
+
+  signaling-image:
+    name: Signaling relay Docker image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f signaling/Dockerfile -t modulex-signaling:ci .
+      - name: Smoke test the container
+        run: |
+          docker run -d --rm -p 8080:8080 --name sig modulex-signaling:ci
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/healthz && break; sleep 1; done
+          docker stop sig

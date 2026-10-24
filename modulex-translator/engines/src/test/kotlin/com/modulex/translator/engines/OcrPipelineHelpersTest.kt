@@ -46,3 +46,12 @@ class OcrPipelineHelpersTest {
         assertEquals("Exit مخرج", OcrPipeline.stripBidiMarks("‎Exit‏ ⁧مخرج⁩"))
     }
 }
+
+class ChrFTest {
+    @Test
+    fun identicalIsHundredDisjointIsZero() {
+        assertEquals(100.0, chrF("Hello world", "Hello world"), 1e-9)
+        assertEquals(0.0, chrF("abc", "xyz"), 1e-9)
+        assertTrue(chrF("Hello there", "Hello world") in 20.0..80.0)
+    }
+}
