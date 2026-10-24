@@ -1,5 +1,6 @@
 package com.modulex.translator.ui.voice
 
+import androidx.compose.foundation.border
 import android.Manifest
 import android.app.Application
 import androidx.compose.animation.core.animateFloatAsState
@@ -233,12 +234,16 @@ fun MicButton(listening: Boolean, hearing: Boolean, level: Float, onClick: () ->
     val scale by animateFloatAsState(if (hearing) 1f + (level * 6f).coerceAtMost(0.25f) else 1f, label = "mic")
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(contentAlignment = Alignment.Center) {
+            // Black-and-white identity: idle is a solid button, listening is the inverted (ringed) one.
+            val fg = if (listening) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(84.dp).scale(scale),
+                modifier = Modifier.size(84.dp).scale(scale)
+                    .then(if (listening) Modifier.border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape) else Modifier),
                 shape = CircleShape,
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = if (listening) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                    containerColor = if (listening) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                    contentColor = fg,
                 ),
             ) {
                 Icon(if (listening) Icons.Filled.Stop else Icons.Filled.Mic,

@@ -210,7 +210,7 @@ fun TextTranslatorScreen(initialText: String?, onBack: () -> Unit, onManagePacks
                 }) { Icon(Icons.Filled.ContentPaste, null); Spacer(Modifier.padding(4.dp)); Text(stringResource(R.string.action_paste)) }
                 Spacer(Modifier.weight(1f))
                 Button(onClick = vm::translate, enabled = st.input.isNotBlank() && st.status != TextStatus.Translating) {
-                    Text(stringResource(R.string.translation))
+                    Text(stringResource(R.string.action_translate))
                 }
             }
 

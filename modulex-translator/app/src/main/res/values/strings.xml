@@ -48,6 +48,7 @@
     <string name="offline_badge">Offline</string>
     <string name="original_text">Original</string>
     <string name="translation">Translation</string>
+    <string name="action_translate">Translate</string>
     <string name="translating">Translating…</string>
     <string name="loading_engine">Preparing the translation engine…</string>
     <string name="chars_count">%1$d / %2$d</string>

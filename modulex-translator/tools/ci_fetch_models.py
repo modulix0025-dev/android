@@ -20,6 +20,7 @@ from huggingface_hub import HfApi, hf_hub_download
 TRANSLATION_REPO = "tencent/Hy-MT2-1.8B-GGUF"
 SPEECH_REPO = "ggerganov/whisper.cpp"
 SPEECH_FILE = "ggml-base.bin"
+SPEECH_SMALL_FILE = "ggml-small-q5_1.bin"
 
 
 def sha256(path):
@@ -84,6 +85,8 @@ def main():
     pins = {
         "translation": fetch(api, TRANSLATION_REPO, pick_gguf, a.dest),
         "speech": fetch(api, SPEECH_REPO, lambda names: SPEECH_FILE if SPEECH_FILE in names else None, a.dest),
+        # Higher-accuracy speech pack (speech-small in the manifest); pinned from the same verified data.
+        "speech_small": fetch(api, SPEECH_REPO, lambda names: SPEECH_SMALL_FILE if SPEECH_SMALL_FILE in names else None, a.dest),
     }
     with open(a.out, "w") as f:
         json.dump(pins, f, indent=1)

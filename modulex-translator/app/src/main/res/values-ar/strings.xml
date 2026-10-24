@@ -46,6 +46,7 @@
     <string name="offline_badge">دون إنترنت</string>
     <string name="original_text">النص الأصلي</string>
     <string name="translation">الترجمة</string>
+    <string name="action_translate">ترجم</string>
     <string name="translating">جارٍ الترجمة…</string>
     <string name="loading_engine">جارٍ تجهيز محرك الترجمة…</string>
     <string name="chars_count">%1$d / %2$d</string>

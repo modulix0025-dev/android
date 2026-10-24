@@ -1,5 +1,6 @@
 package com.modulex.translator.ui.conversation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -256,9 +257,12 @@ private fun Controls() {
                     }
                 }
                 InputMode.PUSH_TO_TALK -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    val hearing = st.mic == MicState.HEARING_SPEECH
                     Surface(
                         shape = CircleShape,
-                        color = if (st.mic == MicState.HEARING_SPEECH) LocalStatusColors.current.live else MaterialTheme.colorScheme.primary,
+                        // Inverted with a ring while speech is heard (black-and-white identity).
+                        color = if (hearing) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                        border = if (hearing) BorderStroke(4.dp, LocalStatusColors.current.live) else null,
                         modifier = Modifier.size(84.dp).semantics { contentDescription = "push to talk" }.pointerInput(Unit) {
                             detectTapGestures(onPress = {
                                 controller.setPushToTalk(true)
@@ -266,7 +270,7 @@ private fun Controls() {
                                 controller.setPushToTalk(false)
                             })
                         },
-                    ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Filled.Mic, null, Modifier.size(36.dp), tint = MaterialTheme.colorScheme.onPrimary) } }
+                    ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Filled.Mic, null, Modifier.size(36.dp), tint = if (hearing) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary) } }
                 }
                 InputMode.HANDS_FREE -> Row(verticalAlignment = Alignment.CenterVertically) {
                     val label = when (st.mic) {

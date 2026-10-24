@@ -214,44 +214,73 @@ jobs:
           done
           exit 1
 
-  # Publishes the debug APK as a pre-release with a stable download URL, when the pushed commit
-  # message contains [release-apk] or the workflow is started by hand.
+  # Publishes test builds as a pre-release with stable download URLs, when the pushed commit message
+  # contains [release-apk] or the workflow is started by hand:
+  #   ModuleX-Translator-debug.apk       "full": every pinned pack (translation, speech, all OCR
+  #                                      languages) inside the APK, verified against its pin
+  #   ModuleX-Translator-lite-debug.apk  packs are downloaded inside the app
   publish-apk:
-    name: Publish debug APK
+    name: Publish debug APKs (full and lite)
     needs: android
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release-apk]')
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 75
     permissions:
       contents: write
-    defaults:
-      run:
-        working-directory: .
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" > /dev/null
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - name: Download and verify every pinned pack
+        run: python3 tools/fetch_bundled_models.py --dest "$RUNNER_TEMP/bundle"
+      - name: Build the full APK
+        run: |
+          mkdir -p build && set -o pipefail
+          ./gradlew :app:assembleDebug -Pmodulex.bundledModels="$RUNNER_TEMP/bundle" --console=plain 2>&1 | tee build/ci-full.log
+          ls -la app/build/outputs/apk/debug/
       - uses: actions/download-artifact@v4
-        with: { name: apks, path: apks }
+        with: { name: apks, path: lite }
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          apk=$(find apks -name app-debug.apk | head -1)
-          [ -n "$apk" ] || { echo "app-debug.apk missing"; exit 1; }
-          cp "$apk" ModuleX-Translator-debug.apk
-          sha256sum ModuleX-Translator-debug.apk | tee ModuleX-Translator-debug.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk ModuleX-Translator-debug.apk
+          cp "$(find lite -name app-debug.apk | head -1)" ModuleX-Translator-lite-debug.apk
+          sha256sum ModuleX-Translator-debug.apk ModuleX-Translator-lite-debug.apk | tee SHA256SUMS
+          full_mb=$(( $(stat -c %s ModuleX-Translator-debug.apk) / 1048576 ))
+          lite_mb=$(( $(stat -c %s ModuleX-Translator-lite-debug.apk) / 1048576 ))
           cat > notes.md <<EOF
-          Test build of ModuleX Translator from commit ${GITHUB_SHA::8} (CI run ${GITHUB_RUN_ID}).
+          Test builds of ModuleX Translator from commit ${GITHUB_SHA::8} (CI run ${GITHUB_RUN_ID}).
 
-          - Debug build, signed with the CI debug key. For testing, not for store distribution.
+          - ModuleX-Translator-debug.apk (${full_mb} MB): everything needed offline is inside the APK —
+            translation model, speech recognition model(s) and text recognition for every listed
+            language. On first start the app copies them into place and checks each file's SHA-256;
+            needs about twice the APK size of free storage at that moment.
+          - ModuleX-Translator-lite-debug.apk (${lite_mb} MB): the same app; packs are downloaded in the app.
+          - Debug builds signed with the CI debug key, for testing (not store distribution).
           - Android 10+ (API 29), 64-bit ARM phones. Offline translation needs ARMv8.2 dot-product support.
-          - Translation (1.1 GB) and speech (148 MB) models are downloaded inside the app (Language Packs),
-            verified by SHA-256. Arabic and English text recognition is bundled.
           - Not yet validated on a physical device.
           EOF
           gh release delete modulex-translator-debug --yes --cleanup-tag || true
-          gh release create modulex-translator-debug ModuleX-Translator-debug.apk ModuleX-Translator-debug.apk.sha256 \
-            --prerelease --target "$GITHUB_SHA" --title "ModuleX Translator (debug test build)" --notes-file notes.md
-          echo "https://github.com/$GH_REPO/releases/download/modulex-translator-debug/ModuleX-Translator-debug.apk"
+          gh release create modulex-translator-debug ModuleX-Translator-debug.apk ModuleX-Translator-lite-debug.apk SHA256SUMS \
+            --prerelease --target "$GITHUB_SHA" --title "ModuleX Translator (debug test builds)" --notes-file notes.md
+      - name: Error summary
+        if: failure()
+        run: |
+          grep -nE "^e: |error:|FAILED|What went wrong|OutOfMemory" build/ci-full.log | head -60 || true
 
   model-eval:
     name: Real models (download, verify, pin, translate, transcribe)

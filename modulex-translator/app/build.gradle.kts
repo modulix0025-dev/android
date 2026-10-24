@@ -17,6 +17,10 @@ val keystoreProps = Properties().apply {
 // APK subject to GPL-3.0 terms. See docs/LICENSING.md.
 val withPiper = providers.gradleProperty("modulex.withPiper").map { it.toBoolean() }.getOrElse(false)
 
+// "Full" APK: a directory laid out as models/<pack id>/<file> (see tools/fetch_bundled_models.py) is
+// packaged as extra assets, so the pinned models work offline without a download on first start.
+val bundledModels = providers.gradleProperty("modulex.bundledModels").orNull?.let { file(it) }
+
 android {
     namespace = "com.modulex.translator"
     compileSdk = 36
@@ -100,7 +104,12 @@ android {
 
     androidResources {
         // Model/OCR data must not be compressed: it is copied out once and memory-mapped.
-        noCompress += listOf("traineddata", "json")
+        noCompress += listOf("traineddata", "json", "gguf", "bin")
+    }
+
+    if (bundledModels != null) {
+        require(File(bundledModels, "models").isDirectory) { "modulex.bundledModels must contain models/<pack id>/<file>" }
+        sourceSets["main"].assets.srcDir(bundledModels)
     }
 
     lint {

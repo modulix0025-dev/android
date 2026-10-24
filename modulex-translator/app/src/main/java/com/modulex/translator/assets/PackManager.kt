@@ -85,7 +85,35 @@ class PackManager(private val context: Context, private val scope: CoroutineScop
             }
             refresh(p.id)
         }
+        installPreloadedModels()
         rebuildTessdataView()
+    }
+
+    /**
+     * "Full" APKs (built with -Pmodulex.bundledModels) also carry downloadable packs under
+     * assets/models/<pack id>/. They are copied out once (the engines need real files to map) and
+     * checked against the same pinned size and SHA-256 as a download.
+     */
+    private suspend fun installPreloadedModels() {
+        for (p in manifest.packs.filter { !it.bundled && it.isPinned }) {
+            if (store.status(p) == PackStatus.INSTALLED_VERIFIED) continue
+            val shipped = runCatching { context.assets.list("models/${p.id}")?.toSet() }.getOrNull() ?: continue
+            if (!p.files.all { it.name in shipped }) continue
+            if (!store.hasRoomFor(p)) {
+                refresh(p.id, failure = InstallFailure.INSUFFICIENT_STORAGE)
+                continue
+            }
+            refresh(p.id, InstallProgress.Committing)
+            val streams = p.files.associate { f -> f.name to context.assets.open("models/${p.id}/${f.name}") }
+            val outcome = try {
+                store.importFiles(p, streams)
+            } catch (e: java.io.IOException) {
+                InstallOutcome.Failed(InstallFailure.IO, e.message ?: "copy failed")
+            } finally {
+                streams.values.forEach { runCatching { it.close() } }
+            }
+            refresh(p.id, failure = (outcome as? InstallOutcome.Failed)?.reason)
+        }
     }
 
     fun requiredBytes(id: String): Long? = manifest.pack(id)?.let(store::requiredFreeBytes)

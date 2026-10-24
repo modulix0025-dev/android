@@ -73,8 +73,10 @@ fun LanguagePacksScreen(onBack: () -> Unit) {
         }
     }
 
-    val engines = states.values.filter { it.pack.kind in setOf(PackKind.TRANSLATION_MODEL, PackKind.SPEECH_MODEL, PackKind.TTS_RUNTIME_DATA) }
-    val languages = states.values.filter { it.pack.kind in setOf(PackKind.OCR_LANGUAGE, PackKind.TTS_VOICE) }
+    // Piper voice packs are only usable when the (GPL-3.0) voice engine is built in.
+    val visible = states.values.filter { BuildConfig.WITH_PIPER || it.pack.kind !in setOf(PackKind.TTS_VOICE, PackKind.TTS_RUNTIME_DATA) }
+    val engines = visible.filter { it.pack.kind in setOf(PackKind.TRANSLATION_MODEL, PackKind.SPEECH_MODEL, PackKind.TTS_RUNTIME_DATA) }
+    val languages = visible.filter { it.pack.kind in setOf(PackKind.OCR_LANGUAGE, PackKind.TTS_VOICE) }
         .sortedWith(compareBy({ !it.usable }, { LanguageRegistry.get(it.pack.languages.firstOrNull() ?: "")?.englishName ?: it.pack.id }))
 
     ScreenScaffold(stringResource(R.string.packs_title), onBack) { pad ->
@@ -167,7 +169,7 @@ private fun PackRow(s: PackState, onInstall: () -> Unit, onCancel: () -> Unit, o
             (s.progress as? InstallProgress.Downloading)?.let { d ->
                 LinearProgressIndicator(progress = { if ((d.total ?: 0) > 0) d.bytes.toFloat() / d.total!! else 0f }, modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp))
             }
-            if (BuildConfig.DIAGNOSTICS) Text("${p.id} · ${p.version} · ${p.upstream}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.outline)
+            if (BuildConfig.DIAGNOSTICS) Text("${p.id} · ${p.version} · ${p.upstream}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(stringResource(R.string.packs_license, p.license), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when {

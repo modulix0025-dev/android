@@ -1,5 +1,6 @@
 package com.modulex.translator.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -78,9 +80,13 @@ fun HomeScreen(navigate: (String) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Column(Modifier.statusBarsPadding().padding(vertical = 12.dp)) {
-                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-                    Text(stringResource(R.string.tagline), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Row(Modifier.statusBarsPadding().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(R.drawable.ic_logo), contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.size(14.dp))
+                    Column {
+                        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Text(stringResource(R.string.tagline), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -107,6 +113,8 @@ private fun FeatureCard(e: Entry, large: Boolean, onClick: () -> Unit) {
         colors = CardDefaults.cardColors(
             containerColor = if (large) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
         ),
+        // Secondary entries sit on the page colour, so a hairline keeps them visibly tappable.
+        border = if (large) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
     ) {
         if (large) {
             Column(Modifier.padding(16.dp)) {

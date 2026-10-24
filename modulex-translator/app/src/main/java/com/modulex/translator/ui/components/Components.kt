@@ -1,5 +1,8 @@
 package com.modulex.translator.ui.components
 
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ButtonDefaults
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -201,7 +204,12 @@ fun Banner(text: String, kind: BannerKind = BannerKind.INFO, actionLabel: String
             Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp))
             Spacer(Modifier.width(10.dp))
             Text(text, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-            if (actionLabel != null && onAction != null) TextButton(onClick = onAction) { Text(actionLabel) }
+            // The action takes the banner's content colour so it stays legible on every banner kind.
+            if (actionLabel != null && onAction != null) {
+                TextButton(onClick = onAction, colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current)) {
+                    Text(actionLabel, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="window_background">#FFF7F9FC</color>
-    <color name="brand">#FF1B5FD9</color>
-    <color name="brand_dark">#FF0B2E6F</color>
-    <color name="launcher_background">#FF0B2E6F</color>
+    <!-- Black-and-white identity (Compose colours live in ui/theme/Theme.kt). -->
+    <color name="window_background">#FFFFFFFF</color>
+    <color name="launcher_background">#FF000000</color>
 </resources>
