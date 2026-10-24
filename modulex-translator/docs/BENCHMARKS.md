@@ -114,8 +114,15 @@ found (see the excluded sources in `docs/LICENSING.md`). No pairs were generated
 English, Spanish, Portuguese and French regional varieties have no openly licensed sentence pairs in
 these sources (Tatoeba does not tag them; Wiktionary has terms only).
 
-Held-out translation results (plain / glossary / glossary + retrieval): run `mt-eval`, recorded below
-once measured.
+Hard terms with all glossaries loaded (curated + Wiktionary dialect terms + Islamic expressions;
+`TranslationQualityExperiment`, CI `mt-eval` run 40091310939, Hy-MT2-1.8B Q4_K_M): plain 22/36,
+glossary **34/36** (held-out terms 11/12), up from 29-30/36 with the curated list alone.
+
+Held-out dialect pairs: the first run (40091310939) is **not valid** and is not reported: OLDI Seed and
+SMOL are multi-parallel, and the per-dialect split had shipped sister translations of 2,003 held-out
+items, which inflates retrieval. The split is now by English sentence (SmolDoc: by document) in every
+dialect, enforced by `ShippedTranslationMemoryTest.heldOutEnglishIsNotShippedInAnyDialect`; the
+re-measured numbers follow.
 
 ## Device measurements: not yet available
 | Measurement | Target (planning) | Result |
