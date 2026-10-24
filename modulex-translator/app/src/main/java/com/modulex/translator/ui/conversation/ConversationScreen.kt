@@ -1,5 +1,6 @@
 package com.modulex.translator.ui.conversation
 
+import com.modulex.translator.ui.components.ChoiceChip
 import androidx.compose.foundation.BorderStroke
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -29,7 +30,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -237,9 +237,9 @@ private fun Controls() {
     Surface(tonalElevation = 3.dp) {
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                FilterChip(st.inputMode == InputMode.HANDS_FREE, { controller.setInputMode(InputMode.HANDS_FREE) }, { Text(stringResource(R.string.conv_auto_mode)) })
-                FilterChip(st.inputMode == InputMode.PUSH_TO_TALK, { controller.setInputMode(InputMode.PUSH_TO_TALK) }, { Text(stringResource(R.string.conv_push_to_talk)) })
-                FilterChip(st.inputMode == InputMode.TEXT, { controller.setInputMode(InputMode.TEXT) }, { Text(stringResource(R.string.conv_text_mode)) })
+                ChoiceChip(st.inputMode == InputMode.HANDS_FREE, stringResource(R.string.conv_auto_mode)) { controller.setInputMode(InputMode.HANDS_FREE) }
+                ChoiceChip(st.inputMode == InputMode.PUSH_TO_TALK, stringResource(R.string.conv_push_to_talk)) { controller.setInputMode(InputMode.PUSH_TO_TALK) }
+                ChoiceChip(st.inputMode == InputMode.TEXT, stringResource(R.string.conv_text_mode)) { controller.setInputMode(InputMode.TEXT) }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.conv_speak_aloud), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)

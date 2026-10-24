@@ -1,5 +1,8 @@
 package com.modulex.translator.ui.components
 
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.ButtonDefaults
@@ -272,3 +275,28 @@ fun TranslationError.messageRes(): Int = when (this) {
     TranslationError.OUT_OF_MEMORY -> R.string.err_out_of_memory
     TranslationError.EMPTY_OUTPUT -> R.string.err_empty_output
 }
+
+/**
+ * Single-choice chip for the black-and-white theme: the selected option is drawn inverted (solid
+ * primary with onPrimary text and a check mark) so the choice never depends on a subtle tint.
+ */
+@Composable
+fun ChoiceChip(selected: Boolean, label: String, onClick: () -> Unit) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        leadingIcon = if (selected) ({ Icon(Icons.Filled.Check, contentDescription = null, Modifier.size(18.dp)) }) else null,
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        border = FilterChipDefaults.filterChipBorder(
+            enabled = true, selected = selected,
+            borderColor = MaterialTheme.colorScheme.outline, selectedBorderColor = MaterialTheme.colorScheme.primary,
+        ),
+    )
+}
+

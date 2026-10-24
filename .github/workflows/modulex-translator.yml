@@ -251,7 +251,7 @@ jobs:
           ./gradlew :app:assembleDebug -Pmodulex.bundledModels="$RUNNER_TEMP/bundle" --console=plain 2>&1 | tee build/ci-full.log
           ls -la app/build/outputs/apk/debug/
       - uses: actions/download-artifact@v4
-        with: { name: apks, path: lite }
+        with: { name: apks, path: modulex-translator/lite }
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}

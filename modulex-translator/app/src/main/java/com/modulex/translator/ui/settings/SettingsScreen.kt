@@ -1,5 +1,6 @@
 package com.modulex.translator.ui.settings
 
+import com.modulex.translator.ui.components.ChoiceChip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -55,16 +55,18 @@ fun SettingsScreen(onBack: () -> Unit, onPrivacy: () -> Unit, onDiagnostics: (()
                 Text(stringResource(R.string.settings_theme))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     ThemeMode.entries.forEach { m ->
-                        FilterChip(s.theme == m, { repo.update { it.copy(theme = m) } }, {
-                            Text(stringResource(when (m) { ThemeMode.SYSTEM -> R.string.settings_theme_system; ThemeMode.LIGHT -> R.string.settings_theme_light; ThemeMode.DARK -> R.string.settings_theme_dark }))
-                        })
+                        ChoiceChip(
+                            s.theme == m,
+                            stringResource(when (m) { ThemeMode.SYSTEM -> R.string.settings_theme_system; ThemeMode.LIGHT -> R.string.settings_theme_light; ThemeMode.DARK -> R.string.settings_theme_dark }),
+                        ) { repo.update { it.copy(theme = m) } }
                     }
                 }
                 Text(stringResource(R.string.settings_language))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    val current = remember { currentAppLocaleTag(context) }
                     listOf("" to R.string.settings_language_system, "en" to null, "ar" to null).forEach { (tag, label) ->
-                        OutlinedButton(onClick = { setAppLocale(context, tag) }) {
-                            Text(label?.let { stringResource(it) } ?: if (tag == "en") "English" else "العربية")
+                        ChoiceChip(current == tag, label?.let { stringResource(it) } ?: if (tag == "en") "English" else "العربية") {
+                            setAppLocale(context, tag)
                         }
                     }
                 }
@@ -115,6 +117,14 @@ private fun Toggle(title: Int, desc: Int?, value: Boolean, onChange: (Boolean) -
         Switch(value, onChange)
     }
 }
+
+/** The per-app language tag ("" = follow the system). */
+private fun currentAppLocaleTag(context: android.content.Context): String =
+    if (Build.VERSION.SDK_INT >= 33) {
+        context.getSystemService(LocaleManager::class.java).applicationLocales.takeIf { !it.isEmpty }?.get(0)?.language ?: ""
+    } else {
+        ""
+    }
 
 /** Per-app language (Android 13+ uses the system per-app setting; older versions follow the system). */
 private fun setAppLocale(context: android.content.Context, tag: String) {
