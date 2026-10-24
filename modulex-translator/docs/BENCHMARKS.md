@@ -51,8 +51,25 @@ These are synthetic renders; real camera photos (blur, perspective, glare) still
 
 ### Translation pipeline (`TranslationEngineTest`, random-weight fixture)
 Verifies the native path only (load, Jinja chat template, tokenise, prefill, decode, streaming,
-cancellation, context-overflow error). **No translation quality or speed figures exist yet: the real
-Hy-MT2 GGUF could not be downloaded in the build environment.**
+cancellation, context-overflow error).
+
+### Real Hy-MT2 and Whisper models (GitHub Actions `ubuntu-24.04` x86_64 runner, 4 threads)
+Measured in CI run 40074325034 with the pinned files (hashes verified against the hub):
+`Hy-MT2-1.8B-Q4_K_M.gguf` (1,133,080,448 bytes) and Whisper `ggml-base.bin` (147,951,465 bytes).
+These are **server CPU** figures, not phone figures.
+
+| Measurement | Result |
+|---|---|
+| Translation model load (mmap) | 930 ms |
+| Corpus (`corpus.tsv`, 16 sentences, greedy) latency | median 1,644 ms, P95 5,340 ms (longest: 3-sentence paragraph, 83 tokens) |
+| chrF vs. reference (automatic, single reference) | ar→en 87.5, en→ar 71.3 |
+| Whisper base load | 88 ms |
+| Whisper base, 11 s English sample (`jfk.wav`) | 1,188 ms, transcript exact; language auto-detected as `en` (p = 0.96) |
+
+Observations from the corpus output (human review still required): meaning was preserved in all
+16 sentences. Lower chrF in en→ar mostly comes from valid wording differences (e.g. «المنصة» vs
+«الرصيف», Western vs Arabic-Indic digits) rather than errors. One grammatical slip in ar→en:
+"a engineer". Egyptian colloquial input («انا عايز اروح المطار بسرعه») was translated correctly.
 
 ## Device measurements: not yet available
 | Measurement | Target (planning) | Result |
@@ -66,4 +83,4 @@ Hy-MT2 GGUF could not be downloaded in the build environment.**
 | Transport latency LAN / Wi-Fi Direct / BLE / Internet | < 300 ms | not measured (loopback lower bound above) |
 | Reconnection time | — | not measured |
 | 15–30 min battery/thermal per scenario | — | not measured |
-| Translation quality (corpus.tsv, human review + chrF) | — | not measured |
+| Translation quality on device | — | same model and decoding as above; device timing not measured |

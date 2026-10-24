@@ -163,9 +163,23 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
+          profile: pixel_6
           disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
           working-directory: modulex-translator
-          script: ./gradlew :app:connectedDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain
+          # 1) Screenshot tour of every screen (EN/AR, light/dark) for UI review; 2) the instrumentation tests.
+          script: |
+            adb install -r -g app/build/outputs/apk/debug/app-debug.apk
+            adb install -r -g app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell am instrument -w -e class com.modulex.translator.ScreenshotTour com.modulex.translator.debug.test/androidx.test.runner.AndroidJUnitRunner | tail -20
+            mkdir -p build && adb pull /sdcard/Android/data/com.modulex.translator.debug/files/screenshots build/screenshots
+            cat build/screenshots/errors.txt || true
+            ./gradlew :app:connectedDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 -Pandroid.testInstrumentationRunnerArguments.notClass=com.modulex.translator.ScreenshotTour --console=plain
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: modulex-translator/build/screenshots/
       - if: always()
         uses: actions/upload-artifact@v4
         with:

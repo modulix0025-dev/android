@@ -17,8 +17,8 @@ in the manifest, notices, diagnostics and this file, as attribution requires.
 | Kotlin, kotlinx, AndroidX, Compose, CameraX | Apache-2.0 | yes | |
 | ZXing core 3.5.3 | Apache-2.0 | yes | |
 | OkHttp 4.12.0 / Okio | Apache-2.0 | yes | |
-| **Hy-MT2-1.8B GGUF** (Tencent Hunyuan) | Repository code: Apache-2.0 (`Tencent-Hunyuan/Hy-MT2/LICENSE.txt`) | downloaded pack | **Check the model card license on Hugging Face before commercial redistribution or bundling.** It could not be retrieved from the build environment. |
-| Whisper ggml models | MIT (OpenAI weights; ggml conversion) | downloaded pack | |
+| **Hy-MT2-1.8B GGUF** (Tencent Hunyuan) | Apache-2.0: declared in the `tencent/Hy-MT2-1.8B-GGUF` model card metadata (read in CI at commit `a0c709d9`); repository code also Apache-2.0 | downloaded pack | Read the full model card text for any additional use notes before commercial redistribution. |
+| Whisper ggml models | MIT (OpenAI weights; ggml conversion; declared in the `ggerganov/whisper.cpp` model card metadata) | downloaded pack | |
 | **Piper (piper1-gpl)** | **GPL-3.0** | only with `-Pmodulex.withPiper=true` | Makes the distributed APK subject to GPL-3.0 (source offer for the whole app). |
 | **eSpeak NG** | **GPL-3.0-or-later** | only with Piper | phoneme data shipped as a pack |
 | onnxruntime-android 1.22.0 | MIT | only with Piper | |
@@ -28,7 +28,7 @@ in the manifest, notices, diagnostics and this file, as attribution requires.
 in `libmx_ai.so` (no socket imports, checked with `nm`). It is therefore not listed in the app.
 
 ## Commercial-release checklist
-1. Confirm the Hy-MT2 model-card license and any use restrictions; record them in the manifest `license` field.
+1. Hy-MT2 model-card metadata declares Apache-2.0 (recorded in the manifest). Read the full card text for any use notes.
 2. Decide on the voice engine: keep Piper off (system offline voices only), or ship a GPL-3.0 build
    with source availability.
 3. Verify every Piper voice's license if voices are offered.

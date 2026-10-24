@@ -16,8 +16,9 @@ reachable. As a result:
   core-ktx (Google Maven blocked). Three compile errors and one start-up race found this way were
   fixed. APIs checked only against stubs remain a risk until a real `./gradlew :app:assembleDebug
   :app:lintDebug`.
-- **No real model was loaded.** Hy-MT2, Whisper and Piper weights could not be downloaded, so there
-  are no translation quality, speed or memory figures, and the corresponding packs ship *unpinned*.
+- **Real models were evaluated in CI, not here.** GitHub Actions downloaded Hy-MT2-1.8B Q4_K_M and
+  Whisper base, verified their SHA-256 against the hub, and ran them through the app's native engines
+  (see `BENCHMARKS.md`). Both packs are now pinned in the manifest. Piper voices were not evaluated.
 - **Nothing was run on a phone.** Device validation, offline airplane-mode tests, two-device transport
   tests and battery/thermal runs are procedures in `docs/`, not results.
 
@@ -39,6 +40,8 @@ reachable. As a result:
 | **Native translation pipeline through JNI**: load, model chat template via Jinja, tokenise, generate, stream, cancel, context overflow, truncated/wrong files rejected without crash | `TranslationEngineTest` (3 pass, 1 skipped = real model) with a random-weight `hunyuan-dense` fixture | host x86_64 build of `libmx_ai.so` |
 | **Native OCR through JNI**: English CER 0.000; Arabic CER 0.660 raw → 0.000 (words exact); mixed Arabic/English page 4/4 lines, CER 0.043; invalid input rejected | `OcrEngineTest` (5) | host build of `libmx_ocr.so` |
 | Native libraries export only `Java_*` symbols and import no socket/DNS functions | `nm -D` on host builds | host |
+| **Real Hy-MT2-1.8B Q4_K_M** through JNI: 16-sentence ar↔en corpus, median 1.6 s, chrF ar→en 87.5 / en→ar 71.3 | `TranslationEngineTest.realModelTranslatesCorpus` | CI x86_64 runner |
+| **Real Whisper base** through JNI: 11 s sample transcribed exactly in 1.2 s, language auto-detected | `SpeechEngineTest.realModelTranscribesSample` | CI x86_64 runner |
 | Signaling relay: join, relay, room full, invalid room, size/rate limits, peer-left, idle expiry, healthz | `signaling` tests (23); real Netty `installDist` checked with curl (200/400/101/426, TLS) | host JVM |
 
 Totals: **96 passed, 0 failed, 1 skipped** (`docs/test-results/JVM_AND_HOST_NATIVE.md`).
@@ -60,8 +63,8 @@ WebRTC data channel + signaling client).
 | Requirement | State |
 |---|---|
 | Single-device text/voice/camera translation | Implemented. Engine path verified on host. Not run on device. |
-| Hy-MT2 runtime integration | Implemented (llama.cpp mainline). Real model not loaded. Q4_K_M compatibility to be confirmed with `tools/check_gguf.py`. |
-| Offline speech recognition | Implemented (whisper.cpp). Model not available here; not run. |
+| Hy-MT2 runtime integration | Implemented (llama.cpp mainline). Real Q4_K_M model verified in CI (`check_gguf.py` + corpus test). Pinned. Not run on a phone. |
+| Offline speech recognition | Implemented (whisper.cpp). Real base model verified in CI. Pinned. Not run on a phone. |
 | OCR (Arabic/English first) | Implemented and verified on host with bundled data. Known Arabic gaps documented. |
 | Offline TTS | System offline voices (default) or Piper (GPL opt-in). Not run. |
 | Two-device conversation | Protocol and security verified on host over loopback TCP. Android transports implemented, not run. |
@@ -81,11 +84,9 @@ implemented *and* verified in some environment. Source-complete is about 90%. De
 | Blocker | Cause | Impact | Resolution |
 |---|---|---|---|
 | No AGP build, no APK | Android SDK/NDK and Google Maven blocked here | Sources type-check against substitutes; resource merging, R8, lint, native cross-compile and the APK are unverified | Build with SDK + NDK r28c: `./gradlew :app:assembleDebug :app:lintDebug` and fix the errors. Allow `dl.google.com` in the environment to do it here. |
-| Translation model not pinned or validated | `huggingface.co` blocked | No offline translation until a pack is installed. Quality and speed unknown. | Download Hy-MT2-1.8B GGUF Q4_K_M, run `check_gguf.py`, `pin_assets.py`, the corpus test, then on-device benchmarks. |
-| Speech model not pinned | same | Voice features need a manual import | `pin_assets.py --pack speech-base ...` |
+| Translation quality on phones | Needs hardware | Server-CPU quality and speed measured; phone speed, memory and thermals unknown | On-device benchmark (Diagnostics screen) on the target phones. |
 | STQ low-bit models unsupported | llama.cpp PR #22836 not merged | Cannot use the 440 MB 1.25-bit model | Track upstream. Integrating that patch set would be a separate, reviewed change. |
 | No device validation | No hardware attached | Latency, memory, thermal and battery unknown; transports untested on radios | Run `DEVICE_VALIDATION.md` and `OFFLINE_TESTING.md` on two phones (incl. the OPPO Reno). |
 | Arabic OCR on real photos | Synthetic tests now pass (per-line height normalisation, word spacing fixed; tessdata_best evaluated and not needed) | Real photos (blur, perspective, glare) unmeasured | Evaluate with device photos; `-Pmodulex.tessdata` switches data for comparison. |
-| Model licence confirmation | Model card not retrievable here | Commercial distribution risk | Confirm the Hy-MT2 model-card licence (`LICENSING.md` checklist). |
 | GPL voice engine | Piper/espeak-ng are GPL-3.0 | Distributing the Piper build has GPL-3.0 obligations | Ship without Piper (default), or comply with GPL-3.0. |
 | Signaling deployment | Needs an operator | Internet mode unavailable until configured | Deploy `signaling/` behind TLS; optional TURN (coturn). |

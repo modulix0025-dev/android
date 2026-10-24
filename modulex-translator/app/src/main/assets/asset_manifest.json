@@ -9,16 +9,19 @@
    "languages": [],
    "files": [
     {
-     "name": "model.gguf"
+     "name": "model.gguf",
+     "url": "https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF/resolve/a0c709d9fac510f2c807aa3af52872340dc37a4a/Hy-MT2-1.8B-Q4_K_M.gguf",
+     "sizeBytes": 1133080448,
+     "sha256": "dc5f44fcf1fa496ee7ad725982c0c8c553a4de00259b53af84c4b89fb0c06699"
     }
    ],
    "upstream": "tencent/Hy-MT2-1.8B-GGUF (Hugging Face)",
-   "license": "Apache-2.0 (code repository: Tencent-Hunyuan/Hy-MT2; confirm the model card license before redistribution)",
+   "license": "Apache-2.0 (declared on the tencent/Hy-MT2-1.8B-GGUF model card)",
    "attribution": "Hy-MT2 translation model by Tencent Hunyuan",
    "meta": {
     "expected_architecture": "hunyuan-dense",
-    "quantization": "Q4_K_M (candidate; requires no custom kernels)",
-    "pin_with": "tools/pin_assets.py --repo tencent/Hy-MT2-1.8B-GGUF --file <exact Q4_K_M filename>",
+    "quantization": "Q4_K_M",
+    "source_file": "Hy-MT2-1.8B-Q4_K_M.gguf",
     "excluded_variants": "2bit/1.25bit GGUFs need the STQ kernel (llama.cpp PR #22836, not in mainline)"
    }
   },
@@ -30,14 +33,17 @@
    "languages": [],
    "files": [
     {
-     "name": "ggml-base.bin"
+     "name": "ggml-base.bin",
+     "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base.bin",
+     "sizeBytes": 147951465,
+     "sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe"
     }
    ],
    "upstream": "ggerganov/whisper.cpp ggml-base.bin (Hugging Face)",
-   "license": "MIT (Whisper weights by OpenAI; whisper.cpp conversion)",
+   "license": "MIT (declared on the ggerganov/whisper.cpp model card; Whisper weights by OpenAI)",
    "attribution": "Whisper speech recognition model by OpenAI, ggml conversion by the whisper.cpp project",
    "meta": {
-    "pin_with": "tools/pin_assets.py --repo ggerganov/whisper.cpp --file ggml-base.bin"
+    "source_file": "ggml-base.bin"
    }
   },
   {
