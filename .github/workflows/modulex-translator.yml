@@ -423,6 +423,18 @@ jobs:
           name: tm-raw
           path: ${{ runner.temp }}/tm-raw
 
+  tm-discover:
+    name: Dialect corpus discovery (Hugging Face, Wikivoyage, Wikidata)
+    if: contains(github.event.head_commit.message, '[tm-discover]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -I tools/tm_discover.py --out "$RUNNER_TEMP/tm_discover.json"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: tm-discover, path: "${{ runner.temp }}/tm_discover.json" }
+
   # Builds the verified dialect corpora (app/src/main/assets/tm, held-out split in engines test
   # resources) from the approved sources only, prints a 200-pair sample per dialect for review and
   # commits the result to this branch, when the commit message contains [tm-build].
