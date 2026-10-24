@@ -11,7 +11,7 @@ Every pair must pass, in this order (the report counts each rejection reason):
   near-dup      word-3-gram Jaccard >= 0.8 with a kept source of the same dialect
   looks-msa     no dialect term and >= 90% of the words are common MSA (Tatoeba MSA frequency): not dialect data
 Terms: dialect lemmas (Wiktionary, approved) that occur in the source, matched like core Glossary.kt.
-Split: a stable 10% (by hash of the normalised source) is held out for evaluation and never shipped
+Split: a stable 10% (by hash of the English side, or the SmolDoc document, the same in every dialect) is held out for evaluation and never shipped
 as a reference; it goes to engines/src/test/resources/tm-heldout/.
 
 Usage: tm_build.py --raw DIR [--raw DIR2 ...] [--seed 7]
@@ -74,8 +74,17 @@ def words(norm):
     return [w for w in norm.split() if any(c.isalnum() for c in w)]
 
 
-def heldout(norm):
-    return int(hashlib.sha1(norm.encode()).hexdigest()[:8], 16) % 10 == 0
+def split_key(en, prov):
+    """What decides the held-out split, identically in every dialect: the English sentence, or the whole
+    document for SmolDoc. Multi-parallel sources (OLDI Seed, SMOL) translate one English sentence into
+    several dialects; splitting per dialect text would put a sister translation of a held-out item among
+    the shipped references and inflate the measured gain of retrieval."""
+    m = re.search(r"smoldoc \([0-9a-f]+\) (\S+)", prov)
+    return "doc:" + m.group(1) if m else "en:" + normalise(en, False)
+
+
+def heldout(key):
+    return int(hashlib.sha1(key.encode()).hexdigest()[:8], 16) % 10 == 0
 
 
 MSA_SHARE = 0.9  # a sentence without any dialect term whose words are this much common MSA is rejected as MSA
@@ -156,7 +165,7 @@ def build_dialect(raw, dialect, approved, domains):
             grams_of.append(g)
             rid = f"{dialect}-{source}-{hashlib.sha1(norm.encode()).hexdigest()[:10]}"
             out = [rid, dialect, src, std, en, ";".join(found), domains.get(source, "general"), prov, lic]
-            (held if heldout(norm) else kept).append(out)
+            (held if heldout(split_key(en, prov)) else kept).append(out)
     return kept, held, reasons
 
 

@@ -90,5 +90,15 @@ class ShippedTranslationMemoryTest {
         }
     }
 
+    /** Multi-parallel sources: a held-out item's English must not be shipped in any other dialect either. */
+    @Test
+    fun heldOutEnglishIsNotShippedInAnyDialect() {
+        val shipped = corpora().filterKeys { it.startsWith("ar") }.values.flatten().map { TranslationMemory.normalise(it[4], "en") }.toSet()
+        val leaks = heldoutDir.listFiles { f -> f.name.startsWith("ar") && f.name.endsWith(".tsv") }.orEmpty().flatMap { f ->
+            f.readLines().drop(1).filter { it.isNotEmpty() }.map { TranslationMemory.normalise(it.split('\t')[4], "en") }.filter { it in shipped }
+        }
+        assertTrue(leaks.isEmpty(), "${leaks.size} held-out English sentences are shipped in some dialect, e.g. ${leaks.take(3)}")
+    }
+
     private operator fun <T> List<T>.component6(): T = this[5]
 }
