@@ -48,14 +48,17 @@ import com.modulex.translator.ui.components.PermissionGate
 import com.modulex.translator.ui.components.ScreenScaffold
 import com.modulex.translator.ui.components.SectionCard
 
+/** Precise location (requested together with approximate, as Android 12 requires) for pre-13 scans. */
+private val locationPermissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
 /** Runtime permissions each transport needs on this Android version. */
 fun permissionsFor(t: TransportKind): List<String> = when (t) {
     TransportKind.LAN, TransportKind.INTERNET -> emptyList()
     TransportKind.WIFI_DIRECT ->
-        if (Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.NEARBY_WIFI_DEVICES) else listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.NEARBY_WIFI_DEVICES) else locationPermissions
     TransportKind.BLUETOOTH ->
         if (Build.VERSION.SDK_INT >= 31) listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT)
-        else listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        else locationPermissions
 }
 
 /** Microphone and notifications are optional: text mode works without them. */
