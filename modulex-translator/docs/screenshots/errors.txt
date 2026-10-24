@@ -1,0 +1,1 @@
+en-light-03-text: AssertionError: Activity never becomes requested state "[DESTROYED]" (last lifecycle transition = "STOPPED")
