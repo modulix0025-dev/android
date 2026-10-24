@@ -46,7 +46,16 @@ jobs:
           path: modulex-translator/third_party
           key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
       - run: tools/fetch-native-deps.sh
-      - run: ./gradlew :core:test :engines:test :signaling:test --console=plain
+      - run: mkdir -p build && set -o pipefail && ./gradlew :core:test :engines:test :signaling:test --console=plain 2>&1 | tee build/ci-jvm.log
+      - name: Error summary
+        if: failure()
+        run: |
+          for f in build/ci-*.log; do
+            [ -f "$f" ] || continue
+            echo "===== $f"
+            grep -nE "^e: |error:|FAILED|What went wrong|Caused by|> Could not|AAPT|Lint found|ERROR" "$f" | grep -v "cmTC_" | head -80
+            grep -A25 "What went wrong" "$f" | head -60
+          done
       - if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -74,7 +83,16 @@ jobs:
           key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
       - run: tools/fetch-native-deps.sh
       - name: Build
-        run: ./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --console=plain --stacktrace
+        run: mkdir -p build && set -o pipefail && ./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --console=plain 2>&1 | tee build/ci-android.log
+      - name: Error summary
+        if: failure()
+        run: |
+          for f in build/ci-*.log; do
+            [ -f "$f" ] || continue
+            echo "===== $f"
+            grep -nE "^e: |error:|FAILED|What went wrong|Caused by|> Could not|AAPT|Lint found|ERROR" "$f" | grep -v "cmTC_" | head -80
+            grep -A25 "What went wrong" "$f" | head -60
+          done
       - name: Verify native libraries (exports, no networking imports, 16 KB alignment)
         run: |
           NM="$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm"
@@ -129,7 +147,16 @@ jobs:
           key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
       - run: tools/fetch-native-deps.sh
       - name: Build app and test APKs (arm64 + x86_64)
-        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain
+        run: mkdir -p build && set -o pipefail && ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest -Pmodulex.abis=arm64-v8a,x86_64 --console=plain 2>&1 | tee build/ci-emulator.log
+      - name: Error summary
+        if: failure()
+        run: |
+          for f in build/ci-*.log; do
+            [ -f "$f" ] || continue
+            echo "===== $f"
+            grep -nE "^e: |error:|FAILED|What went wrong|Caused by|> Could not|AAPT|Lint found|ERROR" "$f" | grep -v "cmTC_" | head -80
+            grep -A25 "What went wrong" "$f" | head -60
+          done
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -169,12 +196,38 @@ jobs:
         run: python3 tools/check_gguf.py third_party/llama.cpp/gguf-py "$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['translation']['path'])")"
       - name: Translation corpus and speech sample with the real models
         run: |
+          mkdir -p build && set -o pipefail
           MODEL=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['translation']['path'])")
           SPEECH=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/pins.json'))['speech']['path'])")
           ./gradlew :engines:test --console=plain \
             --tests '*TranslationEngineTest.realModelTranslatesCorpus' --tests '*SpeechEngineTest.realModelTranscribesSample' \
-            -Pmodulex.testModel="$MODEL" -Pmodulex.testSpeechModel="$SPEECH"
-          grep -h -A400 '<system-out>' engines/build/test-results/test/*.xml | sed -n '1,400p'
+            -Pmodulex.testModel="$MODEL" -Pmodulex.testSpeechModel="$SPEECH" 2>&1 | tee build/ci-model.log
+      - name: Error summary
+        if: failure()
+        run: |
+          for f in build/ci-*.log; do
+            [ -f "$f" ] || continue
+            echo "===== $f"
+            grep -nE "^e: |error:|FAILED|What went wrong|Caused by|> Could not|AAPT|Lint found|ERROR" "$f" | grep -v "cmTC_" | head -80
+            grep -A25 "What went wrong" "$f" | head -60
+          done
+      - name: Model results
+        if: always()
+        run: |
+          echo "===== pins"; cat "$RUNNER_TEMP/pins.json" | python3 -c "import json,sys;d=json.load(sys.stdin);[print(k, json.dumps({x:v[x] for x in v if x!='path'})) for k,v in d.items()]" || true
+          echo "===== test output"
+          for f in engines/build/test-results/test/*.xml; do python3 - "$f" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          r = ET.parse(sys.argv[1]).getroot()
+          for tc in r.findall("testcase"):
+              st = "FAILED" if tc.find("failure") is not None else ("SKIPPED" if tc.find("skipped") is not None else "PASSED")
+              print(r.get("name").split(".")[-1], tc.get("name"), st)
+              f = tc.find("failure")
+              if f is not None: print((f.get("message") or "")[:2000])
+          so = r.find("system-out")
+          if so is not None and so.text: print(so.text[-12000:])
+          PY
+          done
       - if: always()
         uses: actions/upload-artifact@v4
         with:

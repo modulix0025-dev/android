@@ -54,6 +54,7 @@ val buildNativeHost by tasks.registering(Exec::class) {
 val pipelineFixture by tasks.registering(Exec::class) {
     onlyIf { thirdParty.resolve("llama.cpp").isDirectory }
     workingDir = rootProject.projectDir
+    doFirst { rootProject.layout.buildDirectory.dir("fixtures").get().asFile.mkdirs() }
     commandLine("python3", "tools/make_pipeline_fixture.py", "third_party/llama.cpp/gguf-py", "build/fixtures/pipeline-fixture.gguf")
 }
 tasks.test {
