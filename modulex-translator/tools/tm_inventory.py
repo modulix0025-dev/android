@@ -28,6 +28,9 @@ import urllib.request
 
 TATOEBA = "https://downloads.tatoeba.org/exports/per_language"
 WIKT = "https://en.wiktionary.org/w/api.php"
+# Candidate lists longer than this are not scanned for near duplicates. Dialect sets are far below
+# it, so their check is exact; for million-sentence standard languages the near-dup count is a lower bound.
+MAX_POSTING = 2000
 UA = "ModuleX-Translator-corpus-inventory/1 (CI; github.com/modulix0025-dev/android)"
 
 # app language -> (Tatoeba code of the standard language, [(dialect tag, Tatoeba code, name)]).
@@ -153,7 +156,9 @@ def tatoeba(code, std, arabic, cache):
         grams = trigrams(words)
         cand = set()
         for g in grams:
-            cand.update(index.get(g, ()))
+            post = index.get(g, ())
+            if len(post) <= MAX_POSTING:  # very common trigrams (huge standard-language sets) are skipped
+                cand.update(post)
         if any(len(grams & kept[i][1]) / len(grams | kept[i][1]) >= 0.8 for i in cand):
             near += 1
             continue
