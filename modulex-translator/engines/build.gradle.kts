@@ -27,13 +27,15 @@ dependencies {
 // Host builds of the JNI libraries (see native/CMakeLists.txt) are exercised by the JVM tests.
 val nativeHostDir = rootProject.layout.buildDirectory.dir("native-host")
 tasks.test {
-    timeout.set(Duration.ofMinutes(20))
+    // The opt-in translation-quality experiment runs hundreds of generations.
+    timeout.set(Duration.ofMinutes(if (providers.gradleProperty("modulex.mtEvalModels").isPresent) 150 else 20))
     systemProperty("modulex.native.dir", nativeHostDir.get().asFile.absolutePath)
     // -Pmodulex.tessdata=/dir evaluates other OCR data with the same tests (e.g. tessdata_best).
     systemProperty("modulex.tessdata.dir", providers.gradleProperty("modulex.tessdata").getOrElse(rootProject.file("app/src/main/assets/tessdata").absolutePath))
     systemProperty("modulex.pipelineFixture", rootProject.layout.buildDirectory.file("fixtures/pipeline-fixture.gguf").get().asFile.absolutePath)
     providers.gradleProperty("modulex.testModel").orNull?.let { systemProperty("modulex.testModel", it) }
     providers.gradleProperty("modulex.testSpeechModel").orNull?.let { systemProperty("modulex.testSpeechModel", it) }
+    providers.gradleProperty("modulex.mtEvalModels").orNull?.let { systemProperty("modulex.mtEvalModels", it) }
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = true

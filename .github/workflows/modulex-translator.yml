@@ -347,6 +347,42 @@ jobs:
             ${{ runner.temp }}/pins.json
             modulex-translator/engines/build/test-results/test/*.xml
 
+  # Translation-quality experiment (opt-in: [mt-eval] in the commit message or a manual run): the same
+  # hard ar<->en term set on each published quantisation, with greedy vs. sampled decoding, English vs.
+  # Chinese instruction, with and without a terminology hint. Prints every output for review.
+  mt-eval:
+    name: Translation quality experiment (${{ matrix.quant }})
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[mt-eval]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        quant: [Q4_K_M, Q6_K, Q8_0]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y ninja-build python3-numpy
+          python3 -m pip install --user --break-system-packages "huggingface_hub>=0.25"
+      - name: Cache native sources
+        uses: actions/cache@v4
+        with:
+          path: modulex-translator/third_party
+          key: native-src-${{ hashFiles('modulex-translator/tools/fetch-native-deps.sh') }}
+      - run: tools/fetch-native-deps.sh
+      - name: Download and verify the model
+        run: |
+          extra=""; [ "${{ matrix.quant }}" = "Q4_K_M" ] && extra="--print-readme"
+          python3 tools/ci_fetch_gguf.py --file "Hy-MT2-1.8B-${{ matrix.quant }}.gguf" --dest "$RUNNER_TEMP/m" $extra > "$RUNNER_TEMP/path.txt"
+      - name: Run the experiment
+        run: |
+          ./gradlew :engines:test --console=plain --tests '*TranslationQualityExperiment*' \
+            -Pmodulex.mtEvalModels="$(cat "$RUNNER_TEMP/path.txt")"
+
   signaling-image:
     name: Signaling relay Docker image
     runs-on: ubuntu-24.04
