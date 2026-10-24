@@ -24,21 +24,24 @@ class TranslationMemory(entries: List<Entry>) {
 
     data class Match(val entry: Entry, val score: Double)
 
-    private class Indexed(val entry: Entry, val norm: String, val weights: Map<String, Double>, val length: Double)
+    /** Inverted index of one language: per 3-gram, the entries containing it and their TF-IDF weights. */
+    private class LangIndex(
+        val entries: List<Entry>,
+        val idf: Map<String, Double>,
+        val postIdx: Map<String, IntArray>,
+        val postW: Map<String, FloatArray>,
+        val length: DoubleArray,
+    )
 
-    private val byLang: Map<String, List<Indexed>>
+    private val index: Map<String, LangIndex>
     private val exact: Map<Pair<String, String>, Entry>
-    private val idf: Map<String, Map<String, Double>>
-    private val postings: Map<String, Map<String, IntArray>>
     private val dialectModel: Map<String, DialectModel>
 
     val size: Int = entries.size
 
     init {
         val grouped = entries.groupBy { baseLang(it.dialect) }
-        val idfMap = HashMap<String, Map<String, Double>>()
-        val post = HashMap<String, Map<String, IntArray>>()
-        val indexed = HashMap<String, List<Indexed>>()
+        val idx = HashMap<String, LangIndex>()
         val ex = HashMap<Pair<String, String>, Entry>()
         for ((lang, list) in grouped) {
             val norms = list.map { normalise(it.source, lang) }
@@ -47,18 +50,22 @@ class TranslationMemory(entries: List<Entry>) {
             grams.forEach { g -> g.keys.forEach { df[it] = (df[it] ?: 0) + 1 } }
             val n = list.size.toDouble()
             val langIdf = df.mapValues { (_, d) -> ln((n + 1) / (d + 1)) + 1 }
-            idfMap[lang] = langIdf
-            val items = list.indices.map { i ->
-                val w = grams[i].mapValues { (g, tf) -> (1 + ln(tf.toDouble())) * langIdf.getValue(g) }
-                Indexed(list[i], norms[i], w, sqrt(w.values.sumOf { it * it }))
+            val lists = HashMap<String, MutableList<Pair<Int, Float>>>()
+            val length = DoubleArray(list.size)
+            grams.forEachIndexed { i, g ->
+                var sq = 0.0
+                for ((gram, tf) in g) {
+                    val w = (1 + ln(tf.toDouble())) * langIdf.getValue(gram)
+                    sq += w * w
+                    lists.getOrPut(gram) { ArrayList() }.add(i to w.toFloat())
+                }
+                length[i] = sqrt(sq)
             }
-            indexed[lang] = items
-            val lists = HashMap<String, MutableList<Int>>()
-            items.forEachIndexed { i, it -> it.weights.keys.forEach { g -> lists.getOrPut(g) { ArrayList() }.add(i) } }
-            post[lang] = lists.mapValues { it.value.toIntArray() }
-            items.forEach { ex.putIfAbsent(lang to it.norm, it.entry) }
+            idx[lang] = LangIndex(list, langIdf, lists.mapValues { l -> IntArray(l.value.size) { l.value[it].first } },
+                lists.mapValues { l -> FloatArray(l.value.size) { l.value[it].second } }, length)
+            list.forEachIndexed { i, e -> ex.putIfAbsent(lang to norms[i], e) }
         }
-        byLang = indexed; idf = idfMap; postings = post; exact = ex
+        index = idx; exact = ex
         dialectModel = grouped.mapValues { (lang, list) -> DialectModel(list, lang) }
     }
 
@@ -75,23 +82,30 @@ class TranslationMemory(entries: List<Entry>) {
      * detection is unsure.
      */
     fun similar(text: String, sourceLang: String, targetLang: String, k: Int = 3, minScore: Double = 0.3): List<Match> {
-        val items = byLang[sourceLang] ?: return emptyList()
-        val langIdf = idf.getValue(sourceLang)
-        val lists = postings.getValue(sourceLang)
-        val q = ngrams(normalise(text, sourceLang)).mapNotNull { (g, tf) -> langIdf[g]?.let { g to (1 + ln(tf.toDouble())) * it } }.toMap()
+        val li = index[sourceLang] ?: return emptyList()
+        val q = ngrams(normalise(text, sourceLang)).mapNotNull { (g, tf) -> li.idf[g]?.let { g to (1 + ln(tf.toDouble())) * it } }
         if (q.isEmpty()) return emptyList()
-        val qLen = sqrt(q.values.sumOf { it * it })
+        val qLen = sqrt(q.sumOf { it.second * it.second })
+        val dot = DoubleArray(li.entries.size)
+        for ((g, wq) in q) {
+            val ids = li.postIdx.getValue(g); val ws = li.postW.getValue(g)
+            for (j in ids.indices) dot[ids[j]] += wq * ws[j]
+        }
         val dialect = detectDialect(text, sourceLang)
-        val dot = HashMap<Int, Double>()
-        for ((g, wq) in q) for (i in lists[g] ?: continue) dot[i] = (dot[i] ?: 0.0) + wq * items[i].weights.getValue(g)
-        fun ranked(onlyDialect: String?) = dot.entries.asSequence()
-            .map { (i, d) -> items[i] to d / (qLen * items[i].length) }
-            .filter { (it, s) -> s >= minScore && (onlyDialect == null || it.entry.dialect == onlyDialect) &&
-                !it.entry.translations[targetLang].isNullOrBlank() }
-            .sortedByDescending { it.second }
-            .take(k)
-            .map { Match(it.first.entry, it.second) }
-            .toList()
+        fun ranked(onlyDialect: String?): List<Match> {
+            val best = ArrayList<Match>(k + 1)
+            for (i in dot.indices) {
+                if (dot[i] == 0.0) continue
+                val score = dot[i] / (qLen * li.length[i])
+                if (score < minScore || (best.size == k && score <= best.last().score)) continue
+                val e = li.entries[i]
+                if ((onlyDialect != null && e.dialect != onlyDialect) || e.translations[targetLang].isNullOrBlank()) continue
+                best += Match(e, score)
+                best.sortByDescending { it.score }
+                if (best.size > k) best.removeAt(best.lastIndex)
+            }
+            return best
+        }
         return dialect?.let { ranked(it) }?.takeIf { it.isNotEmpty() } ?: ranked(null)
     }
 
@@ -122,14 +136,18 @@ class TranslationMemory(entries: List<Entry>) {
 
         fun classify(norm: String): String? {
             if (counts.size < 2) return counts.keys.firstOrNull()
-            val words = norm.split(' ').filter { it.isNotEmpty() }
-            // Only words seen in exactly one or a few dialects carry evidence; a margin of ln(20) ≈ 3 is required.
+            // Only words seen in some corpus carry evidence (unseen words would favour small corpora). Light
+            // smoothing; the winner must lead by ln(20) ≈ 3.
+            val words = norm.split(' ').filter { w -> w.isNotEmpty() && counts.values.any { w in it } }
+            if (words.isEmpty()) return null
             val scores = counts.keys.associateWith { d ->
                 val m = counts.getValue(d); val t = totals.getValue(d).toDouble()
-                words.sumOf { ln(((m[it] ?: 0) + 0.5) / (t + 0.5 * vocab)) }
+                words.sumOf { ln(((m[it] ?: 0) + ALPHA) / (t + ALPHA * vocab)) }
             }.entries.sortedByDescending { it.value }
             return if (scores[0].value - scores[1].value >= 3.0) scores[0].key else null
         }
+
+        private companion object { const val ALPHA = 0.1 }
     }
 
     companion object {
