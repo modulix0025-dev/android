@@ -37,7 +37,7 @@ reachable. As a result:
 | Prompt templates, long-text splitting (Latin/Arabic/CJK, layout-preserving), sanitiser | `TranslationTest` (9) | host JVM |
 | Language registry, script detection (pair and unique), readiness rules, thermal/memory policy | `LanguageTest` (6) | host JVM |
 | **Native translation pipeline through JNI**: load, model chat template via Jinja, tokenise, generate, stream, cancel, context overflow, truncated/wrong files rejected without crash | `TranslationEngineTest` (3 pass, 1 skipped = real model) with a random-weight `hunyuan-dense` fixture | host x86_64 build of `libmx_ai.so` |
-| **Native OCR through JNI**: English CER 0.000; Arabic CER 0.660 raw → 0.000 with the pipeline; mixed page 3 of 4 lines; invalid input rejected | `OcrEngineTest` (5) | host build of `libmx_ocr.so` |
+| **Native OCR through JNI**: English CER 0.000; Arabic CER 0.660 raw → 0.000 (words exact); mixed Arabic/English page 4/4 lines, CER 0.043; invalid input rejected | `OcrEngineTest` (5) | host build of `libmx_ocr.so` |
 | Native libraries export only `Java_*` symbols and import no socket/DNS functions | `nm -D` on host builds | host |
 | Signaling relay: join, relay, room full, invalid room, size/rate limits, peer-left, idle expiry, healthz | `signaling` tests (23); real Netty `installDist` checked with curl (200/400/101/426, TLS) | host JVM |
 
@@ -85,7 +85,7 @@ implemented *and* verified in some environment. Source-complete is about 90%. De
 | Speech model not pinned | same | Voice features need a manual import | `pin_assets.py --pack speech-base ...` |
 | STQ low-bit models unsupported | llama.cpp PR #22836 not merged | Cannot use the 440 MB 1.25-bit model | Track upstream. Integrating that patch set would be a separate, reviewed change. |
 | No device validation | No hardware attached | Latency, memory, thermal and battery unknown; transports untested on radios | Run `DEVICE_VALIDATION.md` and `OFFLINE_TESTING.md` on two phones (incl. the OPPO Reno). |
-| Arabic OCR quality | Fast Arabic data misses some lines and joins words | Camera translation may miss text | Evaluate `tessdata_best` Arabic, or another Arabic OCR model, on real photos. |
+| Arabic OCR on real photos | Synthetic tests now pass (per-line height normalisation, word spacing fixed; tessdata_best evaluated and not needed) | Real photos (blur, perspective, glare) unmeasured | Evaluate with device photos; `-Pmodulex.tessdata` switches data for comparison. |
 | Model licence confirmation | Model card not retrievable here | Commercial distribution risk | Confirm the Hy-MT2 model-card licence (`LICENSING.md` checklist). |
 | GPL voice engine | Piper/espeak-ng are GPL-3.0 | Distributing the Piper build has GPL-3.0 obligations | Ship without Piper (default), or comply with GPL-3.0. |
 | Signaling deployment | Needs an operator | Internet mode unavailable until configured | Deploy `signaling/` behind TLS; optional TURN (coturn). |

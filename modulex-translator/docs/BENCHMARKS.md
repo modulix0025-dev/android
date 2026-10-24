@@ -29,19 +29,25 @@ CER = character error rate ignoring whitespace.
 
 | Test | Raw Tesseract (auto layout) | ModuleX OCR pipeline | Time (pipeline) |
 |---|---|---|---|
-| English, 2 lines | CER 0.000, conf 96.4 | CER 0.000 | ~70–90 ms |
-| Arabic, 2 lines | **CER 0.660** (second line dropped entirely) | **CER 0.000** (half-scale candidate won) | ~130–175 ms (3 passes) |
-| Mixed Arabic/English signage, 4 lines | — | CER 0.261: both English lines and the first Arabic line read, but **"صيدلية مفتوحة" not recognised** in any mode | ~260–400 ms |
+| English, 2 lines | CER 0.000, conf 96.4 | CER 0.000 | ~70 ms |
+| Arabic, 2 lines | **CER 0.660** (second line dropped) | **CER 0.000, words exact** | ~250 ms |
+| Mixed Arabic/English signage, 4 lines | — | **CER 0.043, 4/4 lines** (one stray diacritic, one trailing ".") | ~500 ms |
 
-Findings:
-1. Tesseract's layout analysis dropped an entire large Arabic line (reproduced in the C API with PSM 3,
-   4 and 6). Single-line mode or half scale read it perfectly. The pipeline's multi-candidate strategy
-   fixes this case.
-2. The fast Arabic model returns nothing for the line "صيدلية مفتوحة" in DejaVu Sans at any scale or
-   mode. This is a data/model limitation. Candidate remedies: `tessdata_best` Arabic (larger, slower), or
-   a different OCR engine for Arabic. Needs evaluation on real photos.
-3. Arabic output sometimes merges two words (missing space: "فيالمطعم"). The translation model usually
-   copes, but it is visible in the recognised text.
+How the gaps were closed (each step measured with the C API and the JNI tests):
+1. Tesseract's layout analysis dropped an entire large Arabic line (PSM 3, 4 and 6). Single-line mode or
+   a smaller scale read it. Hence the multi-candidate pipeline.
+2. The line "صيدلية مفتوحة" was unreadable at 25–45 px glyph height in every mode, with both
+   `tessdata_fast` and `tessdata_best` and in two typefaces (DejaVu Sans, FreeSerif). The **same fast
+   model read it perfectly at ~11–16 px**. The pipeline therefore recognises every detected line at
+   several normalised glyph heights (12/18/26 px) and keeps the best reading. Mixed page: 3/4 → 4/4
+   lines, CER 0.261 → 0.043.
+3. `preserve_interword_spaces=1` removed spaces between Arabic words ("فيالمطعم"). Removing that
+   setting restored correct word boundaries.
+4. `tessdata_best` Arabic (12.6 MB vs 1.4 MB, commit `e12c65a9`) brought no further gain once (1)–(3)
+   were in place and was ~3× slower, so the app keeps `tessdata_fast`. Re-evaluate on real photos:
+   `./gradlew :engines:test -Pmodulex.tessdata=<dir>`.
+
+These are synthetic renders; real camera photos (blur, perspective, glare) still need device evaluation.
 
 ### Translation pipeline (`TranslationEngineTest`, random-weight fixture)
 Verifies the native path only (load, Jinja chat template, tokenise, prefill, decode, streaming,

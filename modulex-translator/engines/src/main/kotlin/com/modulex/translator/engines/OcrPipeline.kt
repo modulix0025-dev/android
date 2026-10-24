@@ -10,7 +10,8 @@ import kotlin.math.roundToInt
  * at half scale). The pipeline therefore produces several candidates and keeps the best:
  *  1. automatic layout at the normalised scale,
  *  2. automatic layout at half scale,
- *  3. projection-based line bands, each recognised in single-line mode (horizontal text only).
+ *  3. projection-based line bands, each recognised in single-line mode at several normalised
+ *     glyph heights (horizontal text only).
  * Boxes are mapped back to the caller's coordinates. Invisible bidi marks are removed from text.
  */
 class OcrPipeline(
@@ -18,6 +19,8 @@ class OcrPipeline(
     private val maxDimension: Int = 2000,
     private val scales: List<Double> = listOf(1.0, 0.5),
     private val minHeightForExtraScale: Int = 60,
+    /** Glyph (ink) heights in pixels tried for each detected line. */
+    private val lineTargets: List<Int> = listOf(12, 18, 26),
 ) {
     data class Result(val ocr: OcrResult, val scaleUsed: Double, val passes: Int, val totalMs: Long, val candidates: List<String> = emptyList())
 
@@ -47,15 +50,37 @@ class OcrPipeline(
             val w = (width * scale).roundToInt().coerceAtLeast(1)
             val h = (height * scale).roundToInt().coerceAtLeast(1)
             val img = if (scale == 1.0) gray else resizeGray(gray, width, height, w, h)
-            val bands = lineBands(img, w, h)
+            val bands = lineBandsWithCore(img, w, h)
             if (bands.size in 1..80) {
                 val lines = ArrayList<OcrLine>()
                 var elapsed = 0L
                 for ((i, band) in bands.withIndex()) {
-                    val crop = img.copyOfRange(band.first * w, band.last.plus(1) * w)
-                    val r = recognizer.recognize(crop, w, band.last - band.first + 1, 1, w, PageLayout.SINGLE_LINE)
-                    elapsed += r.elapsedMs
-                    for (l in r.lines) lines += l.copy(y = l.y + band.first, block = 0, para = i)
+                    val (core, padded) = band
+                    val crop = img.copyOfRange(padded.first * w, padded.last.plus(1) * w)
+                    val bh = padded.last - padded.first + 1
+                    val inkHeight = core.last - core.first + 1
+                    // Tesseract's LSTM is sensitive to glyph height (measured: a line unreadable at
+                    // 25-45 px glyph height was read perfectly at ~11-16 px). Try several normalised
+                    // heights per line and keep the best-scoring reading.
+                    var bestLine: List<OcrLine>? = null
+                    var bestLineScore = -1.0
+                    for (target in lineTargets) {
+                        val f = (target.toDouble() / inkHeight).coerceIn(0.1, 1.5)
+                        val cw = (w * f).roundToInt().coerceAtLeast(1)
+                        val ch = (bh * f).roundToInt().coerceAtLeast(1)
+                        val scaled = if (f == 1.0) crop else resizeGray(crop, w, bh, cw, ch)
+                        val r = recognizer.recognize(scaled, cw, ch, 1, cw, PageLayout.SINGLE_LINE)
+                        elapsed += r.elapsedMs
+                        val sc = score(r)
+                        if (sc > bestLineScore) {
+                            bestLineScore = sc
+                            bestLine = r.lines.map { l ->
+                                l.copy(x = (l.x / f).roundToInt(), y = (l.y / f).roundToInt() + padded.first,
+                                    w = (l.w / f).roundToInt(), h = (l.h / f).roundToInt(), block = 0, para = i)
+                            }
+                        }
+                    }
+                    bestLine?.let { lines += it }
                 }
                 passes++
                 val text = lines.joinToString("\n") { it.text }
@@ -82,7 +107,10 @@ class OcrPipeline(
          * Horizontal text line bands from a row ink profile (Otsu threshold). Returns padded row
          * ranges; empty for images without clear horizontal lines.
          */
-        fun lineBands(gray: ByteArray, w: Int, h: Int): List<IntRange> {
+        fun lineBands(gray: ByteArray, w: Int, h: Int): List<IntRange> = lineBandsWithCore(gray, w, h).map { it.second }
+
+        /** Line bands as (ink rows, padded rows). */
+        fun lineBandsWithCore(gray: ByteArray, w: Int, h: Int): List<Pair<IntRange, IntRange>> {
             val t = otsu(gray)
             val rows = IntArray(h)
             for (y in 0 until h) {
@@ -109,7 +137,7 @@ class OcrPipeline(
             }
             return merged.filter { it.last - it.first + 1 >= 8 }.map {
                 val pad = maxOf(4, (it.last - it.first + 1) / 4)
-                maxOf(0, it.first - pad)..minOf(h - 1, it.last + pad)
+                it to (maxOf(0, it.first - pad)..minOf(h - 1, it.last + pad))
             }
         }
 

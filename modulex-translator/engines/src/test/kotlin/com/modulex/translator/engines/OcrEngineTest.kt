@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
@@ -95,7 +96,10 @@ class OcrEngineTest {
             cer(expected.joinToString("\n"), raw.text), c, p.scaleUsed, p.passes, r.meanConfidence, p.totalMs, r.text.replace("\n", " | ")))
         // Logical (reading) order must be preserved: the first words must come first.
         assertTrue(r.text.trimStart().startsWith("مرحبا"), "Arabic reading order broken: ${r.text}")
-        assertTrue(c < 0.15, "Arabic CER too high: $c")
+        assertTrue(c < 0.05, "Arabic CER too high: $c")
+        // Word boundaries matter for translation: the words must come out separated.
+        assertEquals(expected.joinToString(" ").split(" ").filter { it.isNotBlank() },
+            r.text.split(Regex("\\s+")).filter { it.isNotBlank() })
         ocr.close()
     }
 
@@ -113,13 +117,12 @@ class OcrEngineTest {
         val idxExit = r.text.indexOf("Exit")
         val idxPharmacy = r.text.indexOf("Pharmacy")
         assertTrue(idxExit >= 0 && idxPharmacy > idxExit, "top-to-bottom order lost")
-        assertTrue(r.text.contains("مخرج"), "Arabic line missing")
-        // KNOWN LIMITATION (measured, see docs/BENCHMARKS.md): the bundled fast Arabic model returns
-        // nothing for "صيدلية مفتوحة" rendered in DejaVu Sans, in every segmentation mode and scale.
-        // The test records it instead of hiding it.
-        if (!r.text.contains("صيدلية")) println("  known limitation reproduced: Arabic line 'صيدلية مفتوحة' not recognised")
+        // Both Arabic lines, word-separated. "صيدلية مفتوحة" was unreadable before per-line height
+        // normalisation (docs/BENCHMARKS.md).
+        assertTrue(r.text.contains("مخرج الطوارئ") && r.text.contains("صيدلية مفتوحة"), "Arabic line missing: ${r.text}")
+        assertEquals(4, r.lines.size)
         assertTrue(r.lines.all { it.x >= 0 && it.x + it.w <= w + 2 }, "boxes must be in original coordinates")
-        assertTrue(cer(expected.joinToString("\n"), r.text) < 0.3)
+        assertTrue(cer(expected.joinToString("\n"), r.text) < 0.1)
         ocr.close()
     }
 

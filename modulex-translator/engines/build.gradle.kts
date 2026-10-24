@@ -29,7 +29,8 @@ val nativeHostDir = rootProject.layout.buildDirectory.dir("native-host")
 tasks.test {
     timeout.set(Duration.ofMinutes(20))
     systemProperty("modulex.native.dir", nativeHostDir.get().asFile.absolutePath)
-    systemProperty("modulex.tessdata.dir", rootProject.file("app/src/main/assets/tessdata").absolutePath)
+    // -Pmodulex.tessdata=/dir evaluates other OCR data with the same tests (e.g. tessdata_best).
+    systemProperty("modulex.tessdata.dir", providers.gradleProperty("modulex.tessdata").getOrElse(rootProject.file("app/src/main/assets/tessdata").absolutePath))
     systemProperty("modulex.pipelineFixture", rootProject.layout.buildDirectory.file("fixtures/pipeline-fixture.gguf").get().asFile.absolutePath)
     providers.gradleProperty("modulex.testModel").orNull?.let { systemProperty("modulex.testModel", it) }
     providers.gradleProperty("modulex.testSpeechModel").orNull?.let { systemProperty("modulex.testSpeechModel", it) }
@@ -55,4 +56,8 @@ val pipelineFixture by tasks.registering(Exec::class) {
     workingDir = rootProject.projectDir
     commandLine("python3", "tools/make_pipeline_fixture.py", "third_party/llama.cpp/gguf-py", "build/fixtures/pipeline-fixture.gguf")
 }
-tasks.test { dependsOn(buildNativeHost, pipelineFixture) }
+tasks.test {
+    dependsOn(buildNativeHost, pipelineFixture)
+    // Re-run when the native libraries change.
+    inputs.files(fileTree(nativeHostDir) { include("*.so") }).withPropertyName("nativeLibraries")
+}

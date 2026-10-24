@@ -22,7 +22,7 @@ bool TextRecognizer::init(const std::string & tessdata, const std::string & lang
         return false;
     }
     api_->SetVariable("debug_file", "/dev/null");
-    api_->SetVariable("preserve_interword_spaces", "1");
+    // Note: preserve_interword_spaces=1 was measured to drop spaces between Arabic words; keep the default.
     return true;
 }
 
