@@ -16,8 +16,9 @@ on:
 permissions:
   contents: read
 
+# One run per commit: a newer push must not cancel a long real-model evaluation already running.
 concurrency:
-  group: modulex-${{ github.ref }}
+  group: modulex-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 env:
